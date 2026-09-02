@@ -41,7 +41,7 @@ These challenges can cause students to underestimate or poorly communicate their
 
 There is an opportunity to provide students with a single platform that helps them build and manage their professional profile and use it to prepare for different career opportunities.
 
-Instead of creating a CV from scratch every time, users can maintain one central career profile and use the platform to generate, analyze, and customize their CV based on their goals.
+Instead of creating  a CV from scratch every time, users can maintain one central career profile and use the platform to generate, analyze, and customize their CV based on their goals.
 
 ---
 
