@@ -1,0 +1,78 @@
+# ============================================================
+# AI Career Assistant - docker-compose (SKELETON)
+#
+# Status by task:
+#   - mysql   : usable now (Task 3 depends on it)
+#   - backend : Dockerfile added in Task 23; service defined here for reference
+#   - frontend: Dockerfile added in Task 23; service defined here for reference
+#
+# For local dev before Task 23 you can run just the database:
+#   docker compose up -d mysql
+# ============================================================
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aica-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      # Exposed to the host only for local development/tooling.
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - aica-net
+
+  backend:
+    # build:
+    #   context: ./backend
+    #   dockerfile: Dockerfile
+    image: aica-backend:dev
+    container_name: aica-backend
+    profiles: ["full"] # not started by default until Task 23
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - aica-net
+
+  frontend:
+    # build:
+    #   context: ./frontend
+    #   dockerfile: Dockerfile
+    image: aica-frontend:dev
+    container_name: aica-frontend
+    profiles: ["full"] # not started by default until Task 23
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      - backend
+    networks:
+      - aica-net
+
+volumes:
+  mysql_data:
+
+networks:
+  aica-net:
+    driver: bridge
