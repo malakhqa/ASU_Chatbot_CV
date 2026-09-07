@@ -11,6 +11,15 @@ from app.models.enums import MessageRole
 from app.schemas.common import ORMModel
 
 CVActionVerb = Literal["add", "remove", "replace", "update"]
+CVActionSection = Literal[
+    "summary",
+    "skills",
+    "education",
+    "experience",
+    "projects",
+    "certifications",
+    "languages",
+]
 
 
 class CVAction(BaseModel):
@@ -20,9 +29,16 @@ class CVAction(BaseModel):
     """
 
     type: Literal["cv_update"] = "cv_update"
-    section: str
+    section: CVActionSection
     action: CVActionVerb
     content: Any = None
+
+
+class ChatTurn(BaseModel):
+    """What the model returns for one chat turn (structured output)."""
+
+    reply: str
+    cv_action: CVAction | None = None
 
 
 class ChatSendRequest(BaseModel):
@@ -44,6 +60,8 @@ class ChatSendResponse(BaseModel):
     conversation_id: int
     message: ChatMessageResponse
     proposed_action: CVAction | None = None
+    applied: bool = False
+    cv_version_number: int | None = None
 
 
 class ConversationSummary(ORMModel):

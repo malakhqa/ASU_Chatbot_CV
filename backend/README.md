@@ -8,9 +8,9 @@ FastAPI application.
 backend/
 ├── app/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
-│   ├── api/             # routers: health, auth, profile, cv, jobs (chat added later)
+│   ├── api/             # routers: health, auth, profile, cv, jobs, chat
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
-│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, job services
+│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, job, chatbot
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -164,6 +164,24 @@ the model's output — a guard against hallucinated contact details.
 
 Customization keeps the CV's existing `personal_info` (contact block is not a
 tailoring target). An inline `job_description` is also persisted as a `JobDescription`.
+
+## Chatbot
+
+| Method | Path                              | Body            | Notes |
+| ------ | --------------------------------- | --------------- | ----- |
+| POST   | `/api/chat/message`              | `ChatSendRequest` (`message`, optional `conversation_id` / `cv_id` / `job_description_id`) | `ChatSendResponse`; 404 unknown ref, 502 model failure, 503 AI unconfigured |
+| GET    | `/api/chat/conversations`        | —               | Summaries, most-recently-active first |
+| GET    | `/api/chat/conversations/{id}`   | —               | Full thread with messages |
+| DELETE | `/api/chat/conversations/{id}`   | —               | 204 |
+
+The model returns a `ChatTurn` = `{reply, cv_action?}`. `cv_action` is a
+`{type:"cv_update", section, action, content}` where `section` ∈ {summary, skills,
+education, experience, projects, certifications, languages} and `action` ∈ {add,
+remove, replace, update} — both enforced by the schema. When a `cv_id` is supplied
+and the action validates, it is applied via `cv_service.append_version` as a new
+`chat_edit` version (`applied: true`, `cv_version_number` returned) — never a direct
+DB write. An action the CV service rejects is **not** applied; the reply notes it.
+Without a `cv_id`, the action is returned as `proposed_action` only.
 
 ## Quality gates
 
