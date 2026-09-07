@@ -4,6 +4,10 @@ uvicorn[standard]>=0.32,<0.33
 pydantic[email]>=2.9,<3.0
 pydantic-settings>=2.6,<3.0
 
+# Auth
+pyjwt>=2.9,<3.0
+pwdlib[argon2]>=0.2,<0.3
+
 # Database
 sqlalchemy>=2.0,<2.1
 alembic>=1.13,<2.0

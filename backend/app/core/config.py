@@ -10,8 +10,11 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# 40+ chars: long enough to avoid PyJWT's short-HMAC-key warning. Dev only.
+_DEV_JWT_SECRET = "dev-only-insecure-jwt-secret-change-me-please"
 
 
 class Settings(BaseSettings):
@@ -35,8 +38,8 @@ class Settings(BaseSettings):
     db_pool_size: int = 5
     db_max_overflow: int = 10
 
-    # --- JWT (Task 5+) ---
-    jwt_secret_key: str = "insecure-dev-secret-change-me"
+    # --- JWT ---
+    jwt_secret_key: str = _DEV_JWT_SECRET
     jwt_algorithm: str = "HS256"
     jwt_access_token_expire_minutes: int = 15
     jwt_refresh_token_expire_days: int = 7
@@ -59,6 +62,15 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.environment.lower() in {"production", "prod"}
+
+    @model_validator(mode="after")
+    def _guard_production_secrets(self) -> Settings:
+        if self.is_production:
+            if self.jwt_secret_key in ("", _DEV_JWT_SECRET):
+                raise ValueError("JWT_SECRET_KEY must be set to a strong value in production")
+            if not self.database_url:
+                raise ValueError("DATABASE_URL must be set in production")
+        return self
 
     @property
     def sqlalchemy_url(self) -> str:

@@ -8,9 +8,9 @@ FastAPI application.
 backend/
 ├── app/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
-│   ├── api/             # routers: health (auth, profile, cv, ... added later)
-│   ├── core/            # config (security, dependencies added later)
-│   ├── services/        # business logic + ai_service (Task 6+)
+│   ├── api/             # routers: health, auth (profile, cv, ... added later)
+│   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser)
+│   ├── services/        # business logic: auth_service (ai_service etc. added later)
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -70,6 +70,25 @@ alembic downgrade -1
 The engine is created lazily (`app.database.connection.get_engine`), so importing
 the app without a database configured is fine for tooling and tests. The test
 suite points `DATABASE_URL` at in-memory SQLite.
+
+## Authentication
+
+JWT bearer auth with separate **access** (short-lived) and **refresh** tokens,
+both signed HS256 with `JWT_SECRET_KEY`. Passwords are hashed with Argon2
+(`pwdlib`). Protected routes depend on `CurrentUser` from
+`app.core.dependencies`; `verify_ownership(owner_id, user)` enforces per-user
+resource access.
+
+| Method | Path                 | Body                          | Returns            |
+| ------ | -------------------- | ----------------------------- | ------------------ |
+| POST   | `/api/auth/register` | `{email, password}`           | `TokenResponse` (201) |
+| POST   | `/api/auth/login`    | `{email, password}`           | `TokenResponse`    |
+| POST   | `/api/auth/refresh`  | `{refresh_token}`             | `TokenResponse` (rotated) |
+| GET    | `/api/auth/me`       | — (Bearer access token)       | `UserResponse`     |
+
+Registration creates an empty `Profile` row so `GET /api/profile` always works.
+`ENVIRONMENT=production` refuses to start with a default/empty `JWT_SECRET_KEY`
+or an unset `DATABASE_URL`.
 
 ## Quality gates
 

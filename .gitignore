@@ -69,3 +69,9 @@ Thumbs.db
 
 # ---- Build / misc ----
 *.log
+
+# ---- Local databases / scratch ----
+*.db
+*.sqlite
+*.sqlite3
+_smoke_*.db
