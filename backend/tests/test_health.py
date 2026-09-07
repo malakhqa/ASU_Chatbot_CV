@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from app import __version__
 from fastapi.testclient import TestClient
+
+from app import __version__
 
 
 def test_health_ok(client: TestClient) -> None:

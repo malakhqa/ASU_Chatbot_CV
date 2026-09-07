@@ -3,3 +3,9 @@ fastapi>=0.115,<0.116
 uvicorn[standard]>=0.32,<0.33
 pydantic>=2.9,<3.0
 pydantic-settings>=2.6,<3.0
+
+# Database
+sqlalchemy>=2.0,<2.1
+alembic>=1.13,<2.0
+pymysql>=1.1,<2.0
+cryptography>=42.0  # required by pymysql for MySQL 8 caching_sha2_password auth

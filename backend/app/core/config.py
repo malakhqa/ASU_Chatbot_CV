@@ -27,8 +27,13 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = True
 
-    # --- Database (Task 3+) ---
+    # --- Database ---
+    # SQLAlchemy URL, e.g. mysql+pymysql://user:pass@host:3306/career_assistant
     database_url: str = ""
+    db_echo: bool = False
+    db_pool_pre_ping: bool = True
+    db_pool_size: int = 5
+    db_max_overflow: int = 10
 
     # --- JWT (Task 5+) ---
     jwt_secret_key: str = "insecure-dev-secret-change-me"
@@ -54,6 +59,16 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.environment.lower() in {"production", "prod"}
+
+    @property
+    def sqlalchemy_url(self) -> str:
+        """Validated database URL. Raises if unconfigured."""
+        if not self.database_url:
+            raise RuntimeError(
+                "DATABASE_URL is not set. Copy backend/.env.example to backend/.env "
+                "and set DATABASE_URL (e.g. mysql+pymysql://career:pass@localhost:3306/career_assistant)."
+            )
+        return self.database_url
 
 
 @lru_cache

@@ -76,8 +76,8 @@ ai-career-assistant/
 ## Build progress
 
 - [x] Task 1 — Monorepo scaffold & meta files
-- [ ] Task 2 — FastAPI app skeleton
-- [ ] Task 3 — Database layer
+- [x] Task 2 — FastAPI app skeleton
+- [x] Task 3 — Database layer
 - [ ] Task 4 — Data models & schemas
 - [ ] Task 5 — Authentication
 - [ ] Task 6 — Career Profile API

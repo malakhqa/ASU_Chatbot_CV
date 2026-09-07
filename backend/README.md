@@ -13,8 +13,11 @@ backend/
 │   ├── services/        # business logic + ai_service (Task 6+)
 │   ├── models/          # SQLAlchemy models (Task 4)
 │   ├── schemas/         # Pydantic request/response models (Task 4)
-│   ├── database/        # engine, session, base (Task 3)
+│   ├── database/        # base (declarative Base + mixins), connection (engine),
+│   │                    #   session (SessionLocal + get_db dependency)
 │   └── utils/           # validators, helpers
+├── alembic/             # migration environment (env.py) + versions/
+├── alembic.ini          # URL comes from app settings, not this file
 ├── tests/
 ├── requirements.txt
 ├── requirements-dev.txt
@@ -44,6 +47,27 @@ uvicorn app.main:app --reload --port 8000
 - API root:  http://localhost:8000/
 - Health:    http://localhost:8000/api/health
 - Docs:      http://localhost:8000/docs
+
+## Database & migrations
+
+`DATABASE_URL` (in `backend/.env`) is the single source of truth — `alembic.ini`
+does not contain a URL. Start MySQL via `docker compose up -d mysql` from the repo
+root, then:
+
+```bash
+# create a new migration from model changes
+alembic revision --autogenerate -m "describe change"
+
+# apply migrations
+alembic upgrade head
+
+# roll back one step
+alembic downgrade -1
+```
+
+The engine is created lazily (`app.database.connection.get_engine`), so importing
+the app without a database configured is fine for tooling and tests. The test
+suite points `DATABASE_URL` at in-memory SQLite.
 
 ## Quality gates
 
