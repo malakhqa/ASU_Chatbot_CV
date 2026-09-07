@@ -134,6 +134,9 @@ points at the active one, and every content change appends a new version.
 | POST   | `/api/cv/generate`  | `CVCreateRequest` | Profile → Gemini → structured `CVContent`, v1 (`generated`); **503** if AI unconfigured, **502** on model failure |
 | GET    | `/api/cv/{id}`      | —                 | `CVResponse` with `current_version` |
 | PUT    | `/api/cv/{id}`      | `CVUpdateRequest` | `title`/`template` in place; `content` appends a new version (`manual_edit`) |
+| GET    | `/api/cv/{id}/versions` | —             | `CVVersionResponse[]`, newest first |
+| GET    | `/api/cv/{id}/versions/{n}` | —         | One version |
+| POST   | `/api/cv/{id}/versions/{n}/restore` | —  | Appends a copy of version `n` (`restore`) and points `current` at it |
 
 Not-found and not-owned both return **404** (existence isn't leaked). On generate,
 the CV's `personal_info` (contact block) is filled from the **profile**, never from

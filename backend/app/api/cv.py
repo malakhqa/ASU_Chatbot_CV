@@ -10,7 +10,13 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import AI, CurrentUser
 from app.database import get_db
 from app.models import CV, User
-from app.schemas.cv import CVCreateRequest, CVResponse, CVSummary, CVUpdateRequest
+from app.schemas.cv import (
+    CVCreateRequest,
+    CVResponse,
+    CVSummary,
+    CVUpdateRequest,
+    CVVersionResponse,
+)
 from app.services import cv_service
 from app.services.ai_service import AIError
 
@@ -73,4 +79,38 @@ def update_cv(
         content=payload.content,
         note=payload.note,
     )
+    return cv_service.to_response(db, cv)
+
+
+@router.get("/{cv_id}/versions", response_model=list[CVVersionResponse])
+def list_versions(cv_id: int, current_user: CurrentUser, db: DbSession) -> list[CVVersionResponse]:
+    cv = _get_or_404(db, current_user, cv_id)
+    return [CVVersionResponse.model_validate(v) for v in cv_service.list_versions(db, cv)]
+
+
+@router.get("/{cv_id}/versions/{version_number}", response_model=CVVersionResponse)
+def get_version(
+    cv_id: int, version_number: int, current_user: CurrentUser, db: DbSession
+) -> CVVersionResponse:
+    cv = _get_or_404(db, current_user, cv_id)
+    try:
+        version = cv_service.get_version(db, cv, version_number)
+    except cv_service.CVVersionNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found"
+        ) from None
+    return CVVersionResponse.model_validate(version)
+
+
+@router.post("/{cv_id}/versions/{version_number}/restore", response_model=CVResponse)
+def restore_version(
+    cv_id: int, version_number: int, current_user: CurrentUser, db: DbSession
+) -> CVResponse:
+    _get_or_404(db, current_user, cv_id)
+    try:
+        cv = cv_service.restore_version(db, current_user, cv_id, version_number)
+    except cv_service.CVVersionNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found"
+        ) from None
     return cv_service.to_response(db, cv)

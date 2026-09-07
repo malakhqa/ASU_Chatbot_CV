@@ -30,6 +30,10 @@ class CVNotFoundError(Exception):
     """Raised when a CV does not exist or is not owned by the caller."""
 
 
+class CVVersionNotFoundError(Exception):
+    """Raised when a CV has no version with the requested number."""
+
+
 # --- internals ------------------------------------------------------------------
 
 
@@ -100,6 +104,29 @@ def get_current_version(db: Session, cv: CV) -> CVVersion | None:
     )
 
 
+def list_versions(db: Session, cv: CV) -> list[CVVersion]:
+    """All versions of a CV, newest first."""
+    return list(
+        db.scalars(
+            select(CVVersion)
+            .where(CVVersion.cv_id == cv.id)
+            .order_by(CVVersion.version_number.desc())
+        ).all()
+    )
+
+
+def get_version(db: Session, cv: CV, version_number: int) -> CVVersion:
+    version = db.scalar(
+        select(CVVersion).where(
+            CVVersion.cv_id == cv.id,
+            CVVersion.version_number == version_number,
+        )
+    )
+    if version is None:
+        raise CVVersionNotFoundError(version_number)
+    return version
+
+
 def to_response(db: Session, cv: CV) -> CVResponse:
     version = get_current_version(db, cv)
     return CVResponse(
@@ -168,6 +195,23 @@ def update_cv(
     if content is not None:
         _add_version(db, cv, content, CVVersionSource.MANUAL_EDIT, note=note)
     db.add(cv)
+    db.commit()
+    db.refresh(cv)
+    return cv
+
+
+def restore_version(db: Session, user: User, cv_id: int, version_number: int) -> CV:
+    """Append a new version whose content is copied from ``version_number``."""
+    cv = get_cv(db, user, cv_id)
+    target = get_version(db, cv, version_number)
+    content = CVContent.model_validate(target.content)
+    _add_version(
+        db,
+        cv,
+        content,
+        CVVersionSource.RESTORE,
+        note=f"Restored from v{version_number}",
+    )
     db.commit()
     db.refresh(cv)
     return cv
