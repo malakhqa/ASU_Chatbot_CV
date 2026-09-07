@@ -11,12 +11,14 @@ backend/
 │   ├── api/             # routers: health (auth, profile, cv, ... added later)
 │   ├── core/            # config (security, dependencies added later)
 │   ├── services/        # business logic + ai_service (Task 6+)
-│   ├── models/          # SQLAlchemy models (Task 4)
-│   ├── schemas/         # Pydantic request/response models (Task 4)
+│   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
+│   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
+│   ├── schemas/         # Pydantic request/response models per area + common
 │   ├── database/        # base (declarative Base + mixins), connection (engine),
 │   │                    #   session (SessionLocal + get_db dependency)
 │   └── utils/           # validators, helpers
 ├── alembic/             # migration environment (env.py) + versions/
+│                        #   0001: initial schema (all 8 tables)
 ├── alembic.ini          # URL comes from app settings, not this file
 ├── tests/
 ├── requirements.txt

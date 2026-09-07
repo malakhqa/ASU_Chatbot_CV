@@ -26,14 +26,19 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
-class TimestampMixin:
-    """Adds ``created_at`` / ``updated_at`` columns maintained by the database."""
+class CreatedAtMixin:
+    """Adds a database-maintained ``created_at`` column (append-only tables)."""
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False,
     )
+
+
+class TimestampMixin(CreatedAtMixin):
+    """Adds ``created_at`` / ``updated_at`` columns maintained by the database."""
+
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
