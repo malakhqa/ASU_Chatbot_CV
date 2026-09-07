@@ -20,6 +20,23 @@ import app.models  # noqa: F401  -- populate Base.metadata
 from app.database import get_db
 from app.database.base import Base
 from app.main import create_app
+from app.services import ai_service
+from tests._fakes import FakeAIClient
+
+
+@pytest.fixture(autouse=True)
+def _reset_ai_client() -> Iterator[None]:
+    """Ensure no real Gemini client leaks between tests."""
+    yield
+    ai_service.set_ai_client(None)
+
+
+@pytest.fixture
+def fake_ai() -> FakeAIClient:
+    """Install a FakeAIClient as the active AI client for the test."""
+    client = FakeAIClient()
+    ai_service.set_ai_client(client)
+    return client
 
 
 @pytest.fixture

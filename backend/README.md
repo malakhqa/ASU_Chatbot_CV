@@ -9,8 +9,8 @@ backend/
 ├── app/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
 │   ├── api/             # routers: health, auth, profile (cv, chat, ... added later)
-│   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser)
-│   ├── services/        # business logic: auth_service, profile_service (more later)
+│   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
+│   ├── services/        # auth_service, profile_service, ai_service, prompt_builder
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -100,6 +100,27 @@ or an unset `DATABASE_URL`.
 Scalar contact fields plus JSON sections: `education`, `experience`, `skills`
 (strings), `projects`, `certifications`, `languages`, `awards`. Section item
 shapes live in `app/schemas/profile.py` and are reused by the CV content schema.
+
+## AI service (Gemini)
+
+`app/services/ai_service.py` is the **only** place that talks to Gemini
+(`google-genai`, model `gemini-2.0-flash`). Everything else calls
+`ai_service.generate_text(...)` / `generate_structured(prompt, PydanticSchema, ...)`
+or takes the `AI` FastAPI dependency (`app.core.dependencies`), which returns
+**503** when `GEMINI_API_KEY` is unset.
+
+- **Structured output**: pass a Pydantic model as `schema`; the wrapper sets
+  `response_mime_type=application/json` + `response_schema` and validates the
+  result, raising `AIResponseError` on bad/mismatched JSON.
+- **Retries**: transient failures (429/5xx) retry with exponential backoff up to
+  `GEMINI_MAX_RETRIES`; auth failures (401/403) raise `AIConfigError`; the rest
+  raise `AIError`.
+- **Context**: `app/services/prompt_builder.py` assembles the profile / CV / job /
+  history context and owns `GUARDRAILS` — the "never invent qualifications" rules
+  prepended as the system instruction.
+- **Tests**: `ai_service.set_ai_client(FakeAIClient(...))` swaps in a deterministic
+  stand-in (`tests/_fakes.py`); the `fake_ai` fixture does this and an autouse
+  fixture resets it.
 
 ## Quality gates
 

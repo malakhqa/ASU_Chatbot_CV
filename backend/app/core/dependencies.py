@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from app.core.security import TokenError, decode_token
 from app.database import get_db
 from app.models import User
+from app.services import ai_service
+from app.services.ai_service import AIClient, AIConfigError
 
 bearer_scheme = HTTPBearer(auto_error=False, description="JWT access token")
 
@@ -64,3 +66,17 @@ def verify_ownership(owner_id: int, user: User) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You do not have access to this resource",
         )
+
+
+def get_ai() -> AIClient:
+    """Dependency that yields the AI client, or 503 if it is not configured."""
+    try:
+        return ai_service.get_ai_client()
+    except AIConfigError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="AI service is not configured",
+        ) from exc
+
+
+AI = Annotated[AIClient, Depends(get_ai)]

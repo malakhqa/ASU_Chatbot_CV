@@ -44,9 +44,11 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = 15
     jwt_refresh_token_expire_days: int = 7
 
-    # --- Gemini (Task 7+) ---
+    # --- Gemini ---
     gemini_api_key: str = ""
     gemini_model: str = "gemini-2.0-flash"
+    gemini_timeout_seconds: int = 30
+    gemini_max_retries: int = 2
 
     # --- CORS ---
     # Comma-separated in the environment; exposed as a list via ``cors_origins``.
