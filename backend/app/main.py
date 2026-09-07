@@ -10,7 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import __version__
-from app.api import auth, health, profile
+from app.api import auth, cv, health, profile
 from app.core.config import settings
 
 
@@ -35,6 +35,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix="/api")
     app.include_router(auth.router, prefix="/api")
     app.include_router(profile.router, prefix="/api")
+    app.include_router(cv.router, prefix="/api")
 
     @app.get("/", tags=["meta"])
     def root() -> dict[str, str]:

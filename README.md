@@ -82,7 +82,7 @@ ai-career-assistant/
 - [x] Task 5 — Authentication
 - [x] Task 6 — Career Profile API
 - [x] Task 7 — AI service (Gemini)
-- [ ] Task 8 — CV generation
+- [x] Task 8 — CV generation
 - [ ] Task 9 — CV versioning
 - [ ] Task 10 — CV analysis
 - [ ] Task 11 — Job-specific customization

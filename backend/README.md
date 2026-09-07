@@ -8,9 +8,9 @@ FastAPI application.
 backend/
 ├── app/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
-│   ├── api/             # routers: health, auth, profile (cv, chat, ... added later)
+│   ├── api/             # routers: health, auth, profile, cv (chat, ... added later)
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
-│   ├── services/        # auth_service, profile_service, ai_service, prompt_builder
+│   ├── services/        # auth_service, profile_service, ai_service, prompt_builder, cv_service
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -121,6 +121,23 @@ or takes the `AI` FastAPI dependency (`app.core.dependencies`), which returns
 - **Tests**: `ai_service.set_ai_client(FakeAIClient(...))` swaps in a deterministic
   stand-in (`tests/_fakes.py`); the `fake_ai` fixture does this and an autouse
   fixture resets it.
+
+## CVs
+
+Content is versioned: each CV has `CVVersion` rows, `current_version_number`
+points at the active one, and every content change appends a new version.
+
+| Method | Path                | Body              | Notes |
+| ------ | ------------------- | ----------------- | ----- |
+| GET    | `/api/cv`           | —                 | `CVSummary[]` (no bodies) |
+| POST   | `/api/cv`           | `CVCreateRequest` | Blank CV, v1 empty content (`manual_edit`) |
+| POST   | `/api/cv/generate`  | `CVCreateRequest` | Profile → Gemini → structured `CVContent`, v1 (`generated`); **503** if AI unconfigured, **502** on model failure |
+| GET    | `/api/cv/{id}`      | —                 | `CVResponse` with `current_version` |
+| PUT    | `/api/cv/{id}`      | `CVUpdateRequest` | `title`/`template` in place; `content` appends a new version (`manual_edit`) |
+
+Not-found and not-owned both return **404** (existence isn't leaked). On generate,
+the CV's `personal_info` (contact block) is filled from the **profile**, never from
+the model's output — a guard against hallucinated contact details.
 
 ## Quality gates
 
