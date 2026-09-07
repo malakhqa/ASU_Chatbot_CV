@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Self
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.schemas.common import ORMModel
 
@@ -29,3 +30,9 @@ class CustomizeRequest(BaseModel):
     cv_id: int
     job_description_id: int | None = None
     job_description: JobDescriptionCreate | None = None
+
+    @model_validator(mode="after")
+    def _require_a_job(self) -> Self:
+        if self.job_description_id is None and self.job_description is None:
+            raise ValueError("Provide either job_description_id or job_description")
+        return self

@@ -85,7 +85,7 @@ ai-career-assistant/
 - [x] Task 8 — CV generation
 - [x] Task 9 — CV versioning
 - [x] Task 10 — CV analysis
-- [ ] Task 11 — Job-specific customization
+- [x] Task 11 — Job-specific customization
 - [ ] Task 12 — Chatbot + conversational CV editing
 - [ ] Task 13 — PDF export
 - [ ] Task 14 — Frontend scaffold

@@ -200,6 +200,23 @@ def update_cv(
     return cv
 
 
+def append_version(
+    db: Session,
+    user: User,
+    cv_id: int,
+    content: CVContent,
+    source: CVVersionSource,
+    *,
+    note: str | None = None,
+) -> CV:
+    """Owner-checked public wrapper around ``_add_version`` for other services."""
+    cv = get_cv(db, user, cv_id)
+    _add_version(db, cv, content, source, note=note)
+    db.commit()
+    db.refresh(cv)
+    return cv
+
+
 def restore_version(db: Session, user: User, cv_id: int, version_number: int) -> CV:
     """Append a new version whose content is copied from ``version_number``."""
     cv = get_cv(db, user, cv_id)

@@ -8,7 +8,7 @@ FastAPI application.
 backend/
 ├── app/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
-│   ├── api/             # routers: health, auth, profile, cv (chat, ... added later)
+│   ├── api/             # routers: health, auth, profile, cv, jobs (chat added later)
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
 │   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, job services
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
@@ -151,6 +151,19 @@ the model's output — a guard against hallucinated contact details.
 
 `AnalysisResult` shape (what the model returns and what's stored in `results`):
 `score` (0–100), `strengths[]`, `weaknesses[]`, `missing[]`, `recommendations[]`.
+
+## Jobs & customization
+
+| Method | Path                  | Body               | Notes |
+| ------ | --------------------- | ------------------ | ----- |
+| GET    | `/api/jobs`           | —                  | Saved job descriptions, newest first |
+| POST   | `/api/jobs`           | `JobDescriptionCreate` | 201 |
+| GET    | `/api/jobs/{id}`      | —                  | 404 if unknown/not owned |
+| DELETE | `/api/jobs/{id}`      | —                  | 204 |
+| POST   | `/api/jobs/customize` | `CustomizeRequest` (`cv_id` + `job_description_id` **or** inline `job_description`) | Tailors the CV's current version to the job → new `job_customization` version; returns `CVResponse`. 422 if no job given, 404 unknown CV/job, 502 model failure, 503 AI unconfigured |
+
+Customization keeps the CV's existing `personal_info` (contact block is not a
+tailoring target). An inline `job_description` is also persisted as a `JobDescription`.
 
 ## Quality gates
 
