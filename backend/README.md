@@ -10,7 +10,7 @@ backend/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
 │   ├── api/             # routers: health, auth, profile, cv (chat, ... added later)
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
-│   ├── services/        # auth_service, profile_service, ai_service, prompt_builder, cv_service
+│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, job services
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -141,6 +141,16 @@ points at the active one, and every content change appends a new version.
 Not-found and not-owned both return **404** (existence isn't leaked). On generate,
 the CV's `personal_info` (contact block) is filled from the **profile**, never from
 the model's output — a guard against hallucinated contact details.
+
+### Analysis
+
+| Method | Path                    | Body            | Notes |
+| ------ | ----------------------- | --------------- | ----- |
+| POST   | `/api/cv/analyze`       | `AnalyzeRequest` (`cv_id`, optional `job_description_id`) | Evaluates the CV's current version (optionally vs a job) → `AnalysisResponse` (201, persisted); 404 unknown CV/job, 502 model failure, 503 AI unconfigured |
+| GET    | `/api/cv/{id}/analyses` | —               | Past analyses for that CV, newest first |
+
+`AnalysisResult` shape (what the model returns and what's stored in `results`):
+`score` (0–100), `strengths[]`, `weaknesses[]`, `missing[]`, `recommendations[]`.
 
 ## Quality gates
 

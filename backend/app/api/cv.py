@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.core.dependencies import AI, CurrentUser
 from app.database import get_db
 from app.models import CV, User
+from app.schemas.analysis import AnalysisResponse, AnalyzeRequest
 from app.schemas.cv import (
     CVCreateRequest,
     CVResponse,
@@ -17,8 +18,9 @@ from app.schemas.cv import (
     CVUpdateRequest,
     CVVersionResponse,
 )
-from app.services import cv_service
+from app.services import analysis_service, cv_service
 from app.services.ai_service import AIError
+from app.services.job_service import JobNotFoundError
 
 router = APIRouter(prefix="/cv", tags=["cv"])
 
@@ -57,6 +59,28 @@ def generate_cv(
             detail=f"CV generation failed: {exc}",
         ) from exc
     return cv_service.to_response(db, cv)
+
+
+@router.post("/analyze", response_model=AnalysisResponse, status_code=status.HTTP_201_CREATED)
+def analyze_cv(
+    payload: AnalyzeRequest, current_user: CurrentUser, db: DbSession, ai: AI
+) -> AnalysisResponse:
+    try:
+        analysis = analysis_service.analyze_cv(
+            db, current_user, ai, payload.cv_id, payload.job_description_id
+        )
+    except cv_service.CVNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV not found") from None
+    except JobNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job description not found"
+        ) from None
+    except AIError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"CV analysis failed: {exc}",
+        ) from exc
+    return AnalysisResponse.model_validate(analysis)
 
 
 @router.get("/{cv_id}", response_model=CVResponse)
@@ -114,3 +138,14 @@ def restore_version(
             status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found"
         ) from None
     return cv_service.to_response(db, cv)
+
+
+@router.get("/{cv_id}/analyses", response_model=list[AnalysisResponse])
+def list_cv_analyses(
+    cv_id: int, current_user: CurrentUser, db: DbSession
+) -> list[AnalysisResponse]:
+    _get_or_404(db, current_user, cv_id)
+    return [
+        AnalysisResponse.model_validate(a)
+        for a in analysis_service.list_analyses_for_cv(db, current_user, cv_id)
+    ]

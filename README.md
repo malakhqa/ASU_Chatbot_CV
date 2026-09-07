@@ -84,7 +84,7 @@ ai-career-assistant/
 - [x] Task 7 — AI service (Gemini)
 - [x] Task 8 — CV generation
 - [x] Task 9 — CV versioning
-- [ ] Task 10 — CV analysis
+- [x] Task 10 — CV analysis
 - [ ] Task 11 — Job-specific customization
 - [ ] Task 12 — Chatbot + conversational CV editing
 - [ ] Task 13 — PDF export
