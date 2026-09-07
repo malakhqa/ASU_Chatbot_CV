@@ -80,7 +80,7 @@ ai-career-assistant/
 - [x] Task 3 — Database layer
 - [x] Task 4 — Data models & schemas
 - [x] Task 5 — Authentication
-- [ ] Task 6 — Career Profile API
+- [x] Task 6 — Career Profile API
 - [ ] Task 7 — AI service (Gemini)
 - [ ] Task 8 — CV generation
 - [ ] Task 9 — CV versioning

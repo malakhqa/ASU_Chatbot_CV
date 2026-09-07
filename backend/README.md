@@ -8,9 +8,9 @@ FastAPI application.
 backend/
 ├── app/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
-│   ├── api/             # routers: health, auth (profile, cv, ... added later)
+│   ├── api/             # routers: health, auth, profile (cv, chat, ... added later)
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser)
-│   ├── services/        # business logic: auth_service (ai_service etc. added later)
+│   ├── services/        # business logic: auth_service, profile_service (more later)
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -89,6 +89,17 @@ resource access.
 Registration creates an empty `Profile` row so `GET /api/profile` always works.
 `ENVIRONMENT=production` refuses to start with a default/empty `JWT_SECRET_KEY`
 or an unset `DATABASE_URL`.
+
+## Career profile
+
+| Method | Path           | Body            | Notes                                   |
+| ------ | -------------- | --------------- | --------------------------------------- |
+| GET    | `/api/profile` | —               | Returns the caller's profile (auto-creates if missing) |
+| PUT    | `/api/profile` | `ProfileUpdate` | **Full replace** — omitted lists become `[]`, omitted scalars become `null` |
+
+Scalar contact fields plus JSON sections: `education`, `experience`, `skills`
+(strings), `projects`, `certifications`, `languages`, `awards`. Section item
+shapes live in `app/schemas/profile.py` and are reused by the CV content schema.
 
 ## Quality gates
 
