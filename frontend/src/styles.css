@@ -683,3 +683,25 @@ a {
 .past-analyses__item.is-active {
   border-color: var(--accent);
 }
+
+/* --- job customization --- */
+.job-analysis {
+  margin-top: 1.4rem;
+}
+.job-analysis h2 {
+  font-size: 1.05rem;
+}
+.customized-cv {
+  margin-top: 1.6rem;
+}
+.customized-cv__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+.customized-cv__head p {
+  margin: 0.3rem 0 0;
+}

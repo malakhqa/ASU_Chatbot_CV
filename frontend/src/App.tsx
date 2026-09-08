@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AuthProvider } from '@/context/AuthProvider'
 import AnalyzeCV from '@/pages/AnalyzeCV'
 import CreateCV from '@/pages/CreateCV'
+import CustomizeCV from '@/pages/CustomizeCV'
 import Dashboard from '@/pages/Dashboard'
 import EditCV from '@/pages/EditCV'
 import Login from '@/pages/Login'
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="cvs/new" element={<CreateCV />} />
               <Route path="cvs/:id" element={<EditCV />} />
               <Route path="cvs/:id/analyze" element={<AnalyzeCV />} />
+              <Route path="cvs/:id/customize" element={<CustomizeCV />} />
             </Route>
           </Route>
 

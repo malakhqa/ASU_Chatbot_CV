@@ -18,6 +18,7 @@ frontend/
 │   │   ├── profile/            # Section + one *Form per profile section (reused by cv/)
 │   │   ├── cv/                 # CVEditor, CVPreview, TemplateSelector, CVActions, VersionHistory
 │   │   ├── analyzer/           # ScoreCard, AnalysisResult, Recommendations, AnalysisPanel
+│   │   ├── jobs/               # JobDescriptionForm, JobAnalysis, CustomizedCV
 │   │   └── routing/            # ProtectedRoute
 │   ├── context/
 │   │   ├── authContext.ts      # createContext + types
@@ -32,6 +33,7 @@ frontend/
 │   │   ├── validation.ts       # email / password / confirm validators
 │   │   ├── profile.ts          # toFields / cleanProfilePayload / isDirty
 │   │   ├── cv.ts               # CV_TEMPLATES, templateLabel, emptyCVContent
+│   │   ├── job.ts              # JobDraft, jobChoiceFromDraft
 │   │   ├── format.ts           # formatDate
 │   │   └── download.ts         # saveBlob, filenameFromDisposition
 │   ├── pages/                  # Login, Register, Profile, MyCVs, CreateCV, EditCV*; Dashboard, NotFound (stubs)
@@ -41,6 +43,7 @@ frontend/
 │   │   ├── profileService.ts   # GET / PUT /api/profile
 │   │   ├── cvService.ts        # list / get / create / generate / update / versions / pdf
 │   │   ├── analysisService.ts  # analyze a CV, list past analyses
+│   │   ├── jobService.ts       # jobs CRUD + POST /api/jobs/customize
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
 │   ├── types/                  # API/data types mirroring backend schemas
 │   └── test/setup.ts           # jest-dom matchers
@@ -119,3 +122,9 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   result: `ScoreCard` (0–100, banded), `AnalysisResult` (strengths / weaknesses /
   missing), `Recommendations`. Past analyses (`GET /api/cv/:id/analyses`) load on
   mount; the most recent shows first and older ones are switchable.
+- **`CustomizeCV`** (`/cvs/:id/customize`) — pick a saved job or paste a new one
+  (a new one is saved via `POST /api/jobs` before use, since analyze needs an id).
+  **Analyze match** → `POST /api/cv/analyze` with the job id → reuses the analyzer
+  panel scoped to the role. **Tailor CV for this job** → `POST /api/jobs/customize`
+  → a new `job_customization` version; `CustomizedCV` previews it with "Open in
+  editor" + "Download PDF".

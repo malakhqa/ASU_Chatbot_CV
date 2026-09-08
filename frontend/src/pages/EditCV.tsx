@@ -154,6 +154,9 @@ export default function EditCV() {
         <Link to={`/cvs/${cvId}/analyze`} className="btn btn--secondary cv-toolbar__analyze">
           Analyze
         </Link>
+        <Link to={`/cvs/${cvId}/customize`} className="btn btn--secondary cv-toolbar__analyze">
+          Customize
+        </Link>
         <CVActions
           dirty={dirty}
           saving={saving}

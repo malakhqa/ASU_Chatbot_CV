@@ -109,7 +109,7 @@ ai-career-assistant/
 - [x] Task 17 — CV list & creation
 - [x] Task 18 — CV Editor & Preview
 - [x] Task 19 — CV Analyzer UI
-- [ ] Task 20 — Job customization UI
+- [x] Task 20 — Job customization UI
 - [ ] Task 21 — Chatbot UI
 - [ ] Task 22 — Dashboard
 - [ ] Task 23 — Dockerization
