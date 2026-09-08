@@ -50,8 +50,23 @@ ai-career-assistant/
    docker compose up -d mysql
    ```
 
-3. **Backend** — _added in Task 2._
-4. **Frontend** — _added in Task 14._
+3. **Backend**
+
+   ```bash
+   cd backend && python -m venv .venv && .venv/Scripts/activate  # or source .venv/bin/activate
+   pip install -r requirements-dev.txt
+   cp .env.example .env   # set DATABASE_URL + GEMINI_API_KEY
+   alembic upgrade head
+   uvicorn app.main:app --reload --port 8000
+   ```
+
+4. **Frontend** (needs Node.js 20+)
+
+   ```bash
+   cd frontend && npm install
+   cp .env.example .env.local
+   npm run dev   # http://localhost:5173
+   ```
 
 ## Development conventions
 
@@ -88,7 +103,7 @@ ai-career-assistant/
 - [x] Task 11 — Job-specific customization
 - [x] Task 12 — Chatbot + conversational CV editing
 - [x] Task 13 — PDF export
-- [ ] Task 14 — Frontend scaffold
+- [x] Task 14 — Frontend scaffold
 - [ ] Task 15 — Auth pages
 - [ ] Task 16 — Career Profile UI
 - [ ] Task 17 — CV list & creation
