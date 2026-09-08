@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AuthProvider } from '@/context/AuthProvider'
+import AnalyzeCV from '@/pages/AnalyzeCV'
 import CreateCV from '@/pages/CreateCV'
 import Dashboard from '@/pages/Dashboard'
 import EditCV from '@/pages/EditCV'
@@ -27,6 +28,7 @@ export default function App() {
               <Route path="cvs" element={<MyCVs />} />
               <Route path="cvs/new" element={<CreateCV />} />
               <Route path="cvs/:id" element={<EditCV />} />
+              <Route path="cvs/:id/analyze" element={<AnalyzeCV />} />
             </Route>
           </Route>
 

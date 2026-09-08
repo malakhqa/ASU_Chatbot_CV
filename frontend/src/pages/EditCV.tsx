@@ -151,6 +151,9 @@ export default function EditCV() {
           value={draft.template}
           onChange={(template) => patchDraft({ template })}
         />
+        <Link to={`/cvs/${cvId}/analyze`} className="btn btn--secondary cv-toolbar__analyze">
+          Analyze
+        </Link>
         <CVActions
           dirty={dirty}
           saving={saving}

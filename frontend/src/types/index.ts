@@ -21,3 +21,4 @@ export type {
   CVVersion,
   CVVersionSource,
 } from './cv'
+export type { AnalysisResponse, AnalysisResult, AnalyzeRequest } from './analysis'

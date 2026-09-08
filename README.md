@@ -6,7 +6,7 @@ improve, analyze, and job-tailor their CVs from a single career profile.
 - **Frontend:** React + TypeScript (Vite)
 - **Backend:** Python + FastAPI
 - **Database:** MySQL
-- **AI:** Google Gemini (`gemini-2.0-flash`)
+- **AI:** Google Gemini (`gemini-3.6-flash`)
 - **Deployment:** Docker / docker-compose
 - **PDF:** reportlab (pure-Python; Windows + Docker parity)
 
@@ -108,7 +108,7 @@ ai-career-assistant/
 - [x] Task 16 — Career Profile UI
 - [x] Task 17 — CV list & creation
 - [x] Task 18 — CV Editor & Preview
-- [ ] Task 19 — CV Analyzer UI
+- [x] Task 19 — CV Analyzer UI
 - [ ] Task 20 — Job customization UI
 - [ ] Task 21 — Chatbot UI
 - [ ] Task 22 — Dashboard

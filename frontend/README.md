@@ -17,6 +17,7 @@ frontend/
 │   │   ├── layout/             # Navbar, Sidebar, DashboardLayout
 │   │   ├── profile/            # Section + one *Form per profile section (reused by cv/)
 │   │   ├── cv/                 # CVEditor, CVPreview, TemplateSelector, CVActions, VersionHistory
+│   │   ├── analyzer/           # ScoreCard, AnalysisResult, Recommendations, AnalysisPanel
 │   │   └── routing/            # ProtectedRoute
 │   ├── context/
 │   │   ├── authContext.ts      # createContext + types
@@ -38,7 +39,8 @@ frontend/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
 │   │   ├── authService.ts
 │   │   ├── profileService.ts   # GET / PUT /api/profile
-│   │   ├── cvService.ts        # list / get / create / generate / update CVs
+│   │   ├── cvService.ts        # list / get / create / generate / update / versions / pdf
+│   │   ├── analysisService.ts  # analyze a CV, list past analyses
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
 │   ├── types/                  # API/data types mirroring backend schemas
 │   └── test/setup.ts           # jest-dom matchers
@@ -106,10 +108,14 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   configured", so the user can still start blank) or **Start blank**
   (`POST /api/cv`). On success it routes to `/cvs/:id`.
 - **`EditCV`** (`/cvs/:id`) is the editor: a toolbar (title, `TemplateSelector`,
-  `CVActions`), a collapsible `VersionHistory` with restore, and a two-pane
-  `CVEditor` + live `CVPreview`. The section forms are the same components as the
-  profile editor. **Save** sends `{title, template}` in place and only adds
-  `content` to the payload when the body actually changed (so a title tweak
-  doesn't spawn a version). **Download PDF** (`GET /api/cv/:id/pdf`, blob) is
+  an **Analyze** link, `CVActions`), a collapsible `VersionHistory` with restore,
+  and a two-pane `CVEditor` + live `CVPreview`. The section forms are the same
+  components as the profile editor. **Save** sends `{title, template}` in place and
+  only adds `content` to the payload when the body actually changed (so a title
+  tweak doesn't spawn a version). **Download PDF** (`GET /api/cv/:id/pdf`, blob) is
   disabled while there are unsaved edits. Loaded state lives in a single
   `draft | null` so the editor never flashes an empty frame.
+- **`AnalyzeCV`** (`/cvs/:id/analyze`) runs `POST /api/cv/analyze` and renders the
+  result: `ScoreCard` (0–100, banded), `AnalysisResult` (strengths / weaknesses /
+  missing), `Recommendations`. Past analyses (`GET /api/cv/:id/analyses`) load on
+  mount; the most recent shows first and older ones are switchable.

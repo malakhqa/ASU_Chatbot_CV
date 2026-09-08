@@ -104,7 +104,7 @@ shapes live in `app/schemas/profile.py` and are reused by the CV content schema.
 ## AI service (Gemini)
 
 `app/services/ai_service.py` is the **only** place that talks to Gemini
-(`google-genai`, model `gemini-2.0-flash`). Everything else calls
+(`google-genai`; model from `GEMINI_MODEL`, default `gemini-3.6-flash`). Everything else calls
 `ai_service.generate_text(...)` / `generate_structured(prompt, PydanticSchema, ...)`
 or takes the `AI` FastAPI dependency (`app.core.dependencies`), which returns
 **503** when `GEMINI_API_KEY` is **empty**.

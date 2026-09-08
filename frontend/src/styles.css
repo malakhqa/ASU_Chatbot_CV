@@ -547,3 +547,139 @@ a {
   padding: 0.45rem 0;
   border-top: 1px solid var(--border);
 }
+.cv-toolbar__analyze {
+  text-decoration: none;
+}
+
+/* --- CV analyzer --- */
+.analysis-panel {
+  margin-top: 0.5rem;
+}
+.analysis-panel__top {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+.score-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.2rem;
+  min-width: 180px;
+}
+.score-card__value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.score-card__max {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+.score-card__label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0.2rem 0 0.5rem;
+}
+.score-card__bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.score-card__bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+.score-card--strong .score-card__bar span {
+  background: #1e6b3a;
+}
+.score-card--ok .score-card__bar span {
+  background: #b8860b;
+}
+.score-card--weak .score-card__bar span {
+  background: var(--danger);
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+}
+.list-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+}
+.list-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+.list-card ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.list-card li {
+  margin: 0.2rem 0;
+}
+.list-card--good {
+  border-left-color: #1e6b3a;
+}
+.list-card--warn {
+  border-left-color: #b8860b;
+}
+.list-card--info {
+  border-left-color: var(--accent);
+}
+
+.recommendations {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.2rem;
+  margin-top: 1rem;
+}
+.recommendations h2 {
+  margin-top: 0;
+  font-size: 1.05rem;
+}
+.recommendations ol {
+  margin: 0;
+  padding-left: 1.3rem;
+}
+.recommendations li {
+  margin: 0.35rem 0;
+}
+
+.past-analyses {
+  margin-top: 1.4rem;
+}
+.past-analyses ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.past-analyses__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.past-analyses__item.is-active {
+  border-color: var(--accent);
+}
