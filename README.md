@@ -8,7 +8,7 @@ improve, analyze, and job-tailor their CVs from a single career profile.
 - **Database:** MySQL
 - **AI:** Google Gemini (`gemini-2.0-flash`)
 - **Deployment:** Docker / docker-compose
-- **PDF:** WeasyPrint (HTML/CSS templates)
+- **PDF:** reportlab (pure-Python; Windows + Docker parity)
 
 See [`Documentation/`](Documentation/) for the full business and technical specs.
 
@@ -87,7 +87,7 @@ ai-career-assistant/
 - [x] Task 10 — CV analysis
 - [x] Task 11 — Job-specific customization
 - [x] Task 12 — Chatbot + conversational CV editing
-- [ ] Task 13 — PDF export
+- [x] Task 13 — PDF export
 - [ ] Task 14 — Frontend scaffold
 - [ ] Task 15 — Auth pages
 - [ ] Task 16 — Career Profile UI

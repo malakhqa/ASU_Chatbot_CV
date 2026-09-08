@@ -10,7 +10,7 @@ backend/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
 │   ├── api/             # routers: health, auth, profile, cv, jobs, chat
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
-│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, job, chatbot
+│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, job, chatbot, pdf
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -137,6 +137,7 @@ points at the active one, and every content change appends a new version.
 | GET    | `/api/cv/{id}/versions` | —             | `CVVersionResponse[]`, newest first |
 | GET    | `/api/cv/{id}/versions/{n}` | —         | One version |
 | POST   | `/api/cv/{id}/versions/{n}/restore` | —  | Appends a copy of version `n` (`restore`) and points `current` at it |
+| GET    | `/api/cv/{id}/pdf`  | —                 | Renders the current version → `application/pdf` attachment (filename from the CV title) |
 
 Not-found and not-owned both return **404** (existence isn't leaked). On generate,
 the CV's `personal_info` (contact block) is filled from the **profile**, never from
@@ -173,6 +174,17 @@ tailoring target). An inline `job_description` is also persisted as a `JobDescri
 | GET    | `/api/chat/conversations`        | —               | Summaries, most-recently-active first |
 | GET    | `/api/chat/conversations/{id}`   | —               | Full thread with messages |
 | DELETE | `/api/chat/conversations/{id}`   | —               | 204 |
+
+## PDF export
+
+`GET /api/cv/{id}/pdf` renders the CV's current version via `pdf_service`
+(reportlab, pure Python — no GTK/Cairo, identical on Windows and in Docker). One
+`professional` template; unknown `template` names fall back to it. Fonts are the
+Bitstream Vera family bundled with reportlab (Latin/Latin-Extended/Greek/Cyrillic).
+Complex-script shaping (Arabic, CJK) is a known MVP limitation — no pure-Python
+engine does it well; revisit with WeasyPrint in the Docker image if needed.
+
+## Chatbot
 
 The model returns a `ChatTurn` = `{reply, cv_action?}`. `cv_action` is a
 `{type:"cv_update", section, action, content}` where `section` ∈ {summary, skills,

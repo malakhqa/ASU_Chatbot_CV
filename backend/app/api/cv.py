@@ -1,10 +1,11 @@
-"""CV endpoints: list, create, AI-generate, read, update."""
+"""CV endpoints: list, create, AI-generate, read, update, analyze, PDF."""
 
 from __future__ import annotations
 
+import re
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.dependencies import AI, CurrentUser
@@ -12,13 +13,14 @@ from app.database import get_db
 from app.models import CV, User
 from app.schemas.analysis import AnalysisResponse, AnalyzeRequest
 from app.schemas.cv import (
+    CVContent,
     CVCreateRequest,
     CVResponse,
     CVSummary,
     CVUpdateRequest,
     CVVersionResponse,
 )
-from app.services import analysis_service, cv_service
+from app.services import analysis_service, cv_service, pdf_service
 from app.services.ai_service import AIError
 from app.services.job_service import JobNotFoundError
 
@@ -87,6 +89,28 @@ def analyze_cv(
 def get_cv(cv_id: int, current_user: CurrentUser, db: DbSession) -> CVResponse:
     cv = _get_or_404(db, current_user, cv_id)
     return cv_service.to_response(db, cv)
+
+
+def _pdf_filename(title: str) -> str:
+    slug = re.sub(r"[^A-Za-z0-9._-]+", "-", (title or "").strip()).strip("-") or "cv"
+    return f"{slug[:80]}.pdf"
+
+
+@router.get(
+    "/{cv_id}/pdf",
+    response_class=Response,
+    responses={200: {"content": {"application/pdf": {}}}},
+)
+def download_cv_pdf(cv_id: int, current_user: CurrentUser, db: DbSession) -> Response:
+    cv = _get_or_404(db, current_user, cv_id)
+    version = cv_service.get_current_version(db, cv)
+    content = CVContent.model_validate(version.content) if version is not None else CVContent()
+    pdf_bytes = pdf_service.render_cv_pdf(cv_title=cv.title, content=content, template=cv.template)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{_pdf_filename(cv.title)}"'},
+    )
 
 
 @router.put("/{cv_id}", response_model=CVResponse)
