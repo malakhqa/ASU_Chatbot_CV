@@ -12,18 +12,22 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
+# Anchored to repo root so they never match app source dirs
+# (e.g. frontend/src/lib/). The frontend has its own .gitignore for dist/.
+/build/
+/develop-eggs/
+/dist/
+/downloads/
+/eggs/
+/.eggs/
+/lib/
+/lib64/
+/parts/
+/sdist/
+/var/
+/wheels/
+backend/build/
+backend/dist/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -56,9 +60,10 @@ coverage/
 # ---- Docker ----
 # named volumes are managed by docker; nothing to ignore here yet
 
-# ---- IDE / editors ----
+# ---- IDE / editors / tooling ----
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *~

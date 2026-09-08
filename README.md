@@ -104,7 +104,7 @@ ai-career-assistant/
 - [x] Task 12 — Chatbot + conversational CV editing
 - [x] Task 13 — PDF export
 - [x] Task 14 — Frontend scaffold
-- [ ] Task 15 — Auth pages
+- [x] Task 15 — Auth pages
 - [ ] Task 16 — Career Profile UI
 - [ ] Task 17 — CV list & creation
 - [ ] Task 18 — CV Editor & Preview

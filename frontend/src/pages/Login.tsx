@@ -3,8 +3,13 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 
 import { Button, ErrorMessage, Input } from '@/components/common'
 import { useAuth } from '@/hooks/useAuth'
+import { hasErrors, validateEmail, validateRequired } from '@/lib/validation'
 
-// Minimal working form; Task 15 adds validation and polish.
+interface FieldErrors {
+  email?: string
+  password?: string
+}
+
 export default function Login() {
   const { status, login } = useAuth()
   const navigate = useNavigate()
@@ -13,22 +18,34 @@ export default function Login() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<unknown>(null)
+  const [errors, setErrors] = useState<FieldErrors>({})
+  const [serverError, setServerError] = useState<unknown>(null)
   const [submitting, setSubmitting] = useState(false)
 
   if (status === 'authenticated') {
     return <Navigate to={from} replace />
   }
 
+  function fieldErrors(): FieldErrors {
+    return {
+      email: validateEmail(email),
+      password: validateRequired(password, 'Password'),
+    }
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
+    const next = fieldErrors()
+    setErrors(next)
+    if (hasErrors(next)) return
+
     setSubmitting(true)
-    setError(null)
+    setServerError(null)
     try {
-      await login({ email, password })
+      await login({ email: email.trim(), password })
       navigate(from, { replace: true })
     } catch (err) {
-      setError(err)
+      setServerError(err)
     } finally {
       setSubmitting(false)
     }
@@ -36,15 +53,18 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <form className="auth-card" onSubmit={onSubmit}>
+      <form className="auth-card" onSubmit={onSubmit} noValidate>
         <h1>Sign in</h1>
+
         <Input
           label="Email"
           type="email"
           autoComplete="email"
+          autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
+          onBlur={() => setErrors((p) => ({ ...p, email: validateEmail(email) }))}
+          error={errors.email}
         />
         <Input
           label="Password"
@@ -52,9 +72,14 @@ export default function Login() {
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
+          onBlur={() =>
+            setErrors((p) => ({ ...p, password: validateRequired(password, 'Password') }))
+          }
+          error={errors.password}
         />
-        <ErrorMessage error={error} />
+
+        <ErrorMessage error={serverError} />
+
         <Button type="submit" loading={submitting}>
           Sign in
         </Button>

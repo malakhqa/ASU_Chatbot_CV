@@ -19,8 +19,10 @@ frontend/
 │   │   ├── authContext.ts      # createContext + types
 │   │   └── AuthProvider.tsx    # session state + login/register/logout
 │   ├── hooks/useAuth.ts
-│   ├── lib/errors.ts           # toErrorMessage()
-│   ├── pages/                  # Login, Register, Dashboard, NotFound (more later)
+│   ├── lib/
+│   │   ├── errors.ts           # toErrorMessage()
+│   │   └── validation.ts       # email / password / confirm validators
+│   ├── pages/                  # Login, Register (validated forms); Dashboard, NotFound (stubs)
 │   ├── services/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
 │   │   ├── authService.ts
