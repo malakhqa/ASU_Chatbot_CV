@@ -106,7 +106,7 @@ ai-career-assistant/
 - [x] Task 14 — Frontend scaffold
 - [x] Task 15 — Auth pages
 - [x] Task 16 — Career Profile UI
-- [ ] Task 17 — CV list & creation
+- [x] Task 17 — CV list & creation
 - [ ] Task 18 — CV Editor & Preview
 - [ ] Task 19 — CV Analyzer UI
 - [ ] Task 20 — Job customization UI

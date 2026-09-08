@@ -22,16 +22,20 @@ frontend/
 │   │   └── AuthProvider.tsx    # session state + login/register/logout
 │   ├── hooks/
 │   │   ├── useAuth.ts
-│   │   └── useProfile.ts       # load / reload the career profile
+│   │   ├── useProfile.ts       # load / reload the career profile
+│   │   └── useCVs.ts           # load / reload the CV list
 │   ├── lib/
 │   │   ├── errors.ts           # toErrorMessage()
 │   │   ├── validation.ts       # email / password / confirm validators
-│   │   └── profile.ts          # toFields / cleanProfilePayload / isDirty
-│   ├── pages/                  # Login, Register, Profile (validated forms); Dashboard, NotFound (stubs)
+│   │   ├── profile.ts          # toFields / cleanProfilePayload / isDirty
+│   │   ├── cv.ts               # CV_TEMPLATES, templateLabel
+│   │   └── format.ts           # formatDate
+│   ├── pages/                  # Login, Register, Profile, MyCVs, CreateCV, EditCV*; Dashboard, NotFound (stubs)
 │   ├── services/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
 │   │   ├── authService.ts
 │   │   ├── profileService.ts   # GET / PUT /api/profile
+│   │   ├── cvService.ts        # list / get / create / generate / update CVs
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
 │   ├── types/                  # API/data types mirroring backend schemas
 │   └── test/setup.ts           # jest-dom matchers
@@ -89,3 +93,14 @@ sends `cleanProfilePayload(...)` to `PUT /api/profile` — blank scalars become
 required key like a language's `name`) are dropped so the backend's strict PUT
 doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
 `technologies` / `highlights` use `TagsInput`.
+
+## CVs (`/cvs`, `/cvs/new`, `/cvs/:id`)
+
+- **`MyCVs`** lists CV cards (`GET /api/cv`) with an empty state; each card links
+  to `/cvs/:id`.
+- **`CreateCV`** takes a title + template and offers two paths: **Generate from my
+  profile** (`POST /api/cv/generate` — AI draft; **503** shows "AI service is not
+  configured", so the user can still start blank) or **Start blank**
+  (`POST /api/cv`). On success it routes to `/cvs/:id`.
+- **`EditCV`** is a placeholder that loads the CV (`GET /api/cv/:id`) and shows its
+  meta + summary/skills — the full section editor + live preview land in Task 18.

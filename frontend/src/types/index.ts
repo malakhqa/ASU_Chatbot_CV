@@ -11,3 +11,13 @@ export type {
   ProfileUpdate,
   ProjectItem,
 } from './profile'
+export type {
+  CVContent,
+  CVCreateRequest,
+  CVPersonalInfo,
+  CVResponse,
+  CVSummary,
+  CVUpdateRequest,
+  CVVersion,
+  CVVersionSource,
+} from './cv'
