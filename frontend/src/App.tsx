@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/AuthProvider'
 import Dashboard from '@/pages/Dashboard'
 import Login from '@/pages/Login'
 import NotFound from '@/pages/NotFound'
+import Profile from '@/pages/Profile'
 import Register from '@/pages/Register'
 
 export default function App() {
@@ -19,6 +20,7 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<DashboardLayout />}>
               <Route index element={<Dashboard />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
           </Route>
 

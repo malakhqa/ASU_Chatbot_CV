@@ -1,0 +1,8 @@
+export { PersonalInfoForm } from './PersonalInfoForm'
+export { SkillsForm } from './SkillsForm'
+export { ExperienceForm } from './ExperienceForm'
+export { EducationForm } from './EducationForm'
+export { ProjectsForm } from './ProjectsForm'
+export { CertificationsForm } from './CertificationsForm'
+export { LanguagesForm } from './LanguagesForm'
+export { AwardsForm } from './AwardsForm'

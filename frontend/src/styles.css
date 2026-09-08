@@ -252,3 +252,131 @@ a {
   font-size: 0.9rem;
   color: var(--muted);
 }
+
+/* --- profile / forms --- */
+.page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.page__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.page__footer {
+  margin-top: 1.5rem;
+}
+.badge {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--border);
+  color: var(--text);
+}
+.badge--ok {
+  background: #e3f4e8;
+  color: #1e6b3a;
+}
+
+.profile-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+.profile-section__header {
+  margin-bottom: 0.6rem;
+}
+.profile-section__header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+.profile-section__header p {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.9rem;
+}
+@media (max-width: 560px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  margin: 0.2rem 0 0.8rem;
+}
+
+/* repeatable rows */
+.repeatable__row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem;
+  margin-bottom: 0.7rem;
+  position: relative;
+}
+.repeatable__remove {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--muted);
+}
+.repeatable__remove:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+/* tags input */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.tags__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.85rem;
+}
+.tags__remove {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--muted);
+}
+.tags__input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 8rem;
+  font-size: 0.9rem;
+  background: transparent;
+}

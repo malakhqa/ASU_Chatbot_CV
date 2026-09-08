@@ -13,6 +13,13 @@ export function validateEmail(value: string): string | undefined {
   return undefined
 }
 
+/** Like validateEmail but an empty value is allowed. */
+export function validateEmailOptional(value: string | null | undefined): string | undefined {
+  if (!value || !value.trim()) return undefined
+  if (!EMAIL_RE.test(value.trim())) return 'Enter a valid email address.'
+  return undefined
+}
+
 /** Full strength check — used on registration. */
 export function validateNewPassword(value: string): string | undefined {
   if (!value) return 'Password is required.'

@@ -12,20 +12,26 @@ frontend/
 │   ├── App.tsx                  # BrowserRouter + AuthProvider + routes
 │   ├── config.ts               # API_BASE_URL from VITE_API_BASE_URL
 │   ├── components/
-│   │   ├── common/             # Button, Input, Modal, Loading, ErrorMessage
+│   │   ├── common/             # Button, Input, TextArea, Modal, Loading,
+│   │   │                       #   ErrorMessage, TagsInput, RepeatableList
 │   │   ├── layout/             # Navbar, Sidebar, DashboardLayout
+│   │   ├── profile/            # Section + one *Form per profile section
 │   │   └── routing/            # ProtectedRoute
 │   ├── context/
 │   │   ├── authContext.ts      # createContext + types
 │   │   └── AuthProvider.tsx    # session state + login/register/logout
-│   ├── hooks/useAuth.ts
+│   ├── hooks/
+│   │   ├── useAuth.ts
+│   │   └── useProfile.ts       # load / reload the career profile
 │   ├── lib/
 │   │   ├── errors.ts           # toErrorMessage()
-│   │   └── validation.ts       # email / password / confirm validators
-│   ├── pages/                  # Login, Register (validated forms); Dashboard, NotFound (stubs)
+│   │   ├── validation.ts       # email / password / confirm validators
+│   │   └── profile.ts          # toFields / cleanProfilePayload / isDirty
+│   ├── pages/                  # Login, Register, Profile (validated forms); Dashboard, NotFound (stubs)
 │   ├── services/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
 │   │   ├── authService.ts
+│   │   ├── profileService.ts   # GET / PUT /api/profile
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
 │   ├── types/                  # API/data types mirroring backend schemas
 │   └── test/setup.ts           # jest-dom matchers
@@ -72,3 +78,14 @@ the access token to every request; on a `401` (non-auth endpoint) it runs **one*
 refresh — de-duplicated across concurrent requests — replays the original request,
 and on failure clears tokens and notifies `AuthProvider`, which flips to
 `anonymous` so `ProtectedRoute` redirects to `/login`.
+
+## Career profile page (`/profile`)
+
+`useProfile` loads `GET /api/profile`; the page keeps a local editable copy of the
+editable fields (`lib/profile.toFields`). **Save** is enabled only when the copy
+differs from the loaded profile (`isDirty`) and the optional email is valid; it
+sends `cleanProfilePayload(...)` to `PUT /api/profile` — blank scalars become
+`null`, string lists are trimmed, and placeholder rows (empty, or missing a
+required key like a language's `name`) are dropped so the backend's strict PUT
+doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
+`technologies` / `highlights` use `TagsInput`.
