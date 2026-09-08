@@ -20,6 +20,7 @@ frontend/
 │   │   ├── analyzer/           # ScoreCard, AnalysisResult, Recommendations, AnalysisPanel
 │   │   ├── jobs/               # JobDescriptionForm, JobAnalysis, CustomizedCV
 │   │   ├── chatbot/            # Chatbot, ChatMessage, ChatInput, CVActionNotification
+│   │   ├── dashboard/          # ProfileStatusCard, RecentCVsCard
 │   │   └── routing/            # ProtectedRoute
 │   ├── context/
 │   │   ├── authContext.ts      # createContext + types
@@ -38,7 +39,8 @@ frontend/
 │   │   ├── job.ts              # JobDraft, jobChoiceFromDraft
 │   │   ├── format.ts           # formatDate
 │   │   └── download.ts         # saveBlob, filenameFromDisposition
-│   ├── pages/                  # Login, Register, Profile, MyCVs, CreateCV, EditCV*; Dashboard, NotFound (stubs)
+│   ├── pages/                  # Login, Register, Dashboard, Profile, MyCVs, CreateCV,
+│   │                           #   EditCV, AnalyzeCV, CustomizeCV, Chat; NotFound
 │   ├── services/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
 │   │   ├── authService.ts

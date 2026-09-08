@@ -869,3 +869,57 @@ a {
 .chat-conv__delete:hover {
   color: var(--danger);
 }
+
+/* --- dashboard --- */
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.2rem 0;
+}
+.dash-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.2rem;
+}
+.dash-card h2 {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+}
+.dash-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.dash-card .score-card__bar {
+  margin-bottom: 0.5rem;
+}
+.dash-cv-list {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.dash-cv-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  font-size: 0.9rem;
+}
+.dash-card__more {
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+}
+.dash-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.dash-actions .btn {
+  text-decoration: none;
+}

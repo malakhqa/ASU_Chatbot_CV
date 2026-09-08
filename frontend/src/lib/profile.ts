@@ -99,3 +99,32 @@ export function cleanProfilePayload(fields: ProfileFields): ProfileUpdate {
 export function isDirty(a: ProfileFields, b: ProfileFields): boolean {
   return JSON.stringify(a) !== JSON.stringify(b)
 }
+
+export interface ProfileCompleteness {
+  filled: number
+  total: number
+  pct: number
+  missing: string[]
+}
+
+const COMPLETENESS_CHECKS: Array<[string, (f: ProfileFields) => boolean]> = [
+  ['Name', (f) => Boolean(f.full_name?.trim())],
+  ['Contact', (f) => Boolean(f.email?.trim() || f.phone?.trim())],
+  ['Summary', (f) => Boolean(f.summary?.trim())],
+  ['Skills', (f) => f.skills.length > 0],
+  ['Experience', (f) => f.experience.length > 0],
+  ['Education', (f) => f.education.length > 0],
+  ['Projects', (f) => f.projects.length > 0],
+]
+
+export function profileCompleteness(fields: ProfileFields): ProfileCompleteness {
+  const results = COMPLETENESS_CHECKS.map(([label, test]) => [label, test(fields)] as const)
+  const filled = results.filter(([, ok]) => ok).length
+  const total = results.length
+  return {
+    filled,
+    total,
+    pct: total ? Math.round((filled / total) * 100) : 0,
+    missing: results.filter(([, ok]) => !ok).map(([label]) => label),
+  }
+}

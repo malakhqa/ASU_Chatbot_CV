@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Profile } from '@/types'
-import { cleanProfilePayload, emptyProfileFields, isDirty, toFields } from './profile'
+import {
+  cleanProfilePayload,
+  emptyProfileFields,
+  isDirty,
+  profileCompleteness,
+  toFields,
+} from './profile'
 
 const fullProfile: Profile = {
   id: 1,
@@ -75,5 +81,33 @@ describe('isDirty', () => {
     expect(isDirty(a, b)).toBe(false)
     b.full_name = 'Changed'
     expect(isDirty(a, b)).toBe(true)
+  })
+})
+
+describe('profileCompleteness', () => {
+  it('is empty for a blank profile', () => {
+    const c = profileCompleteness(emptyProfileFields())
+    expect(c.filled).toBe(0)
+    expect(c.total).toBe(7)
+    expect(c.pct).toBe(0)
+    expect(c.missing).toContain('Skills')
+  })
+
+  it('counts filled sections', () => {
+    const f = emptyProfileFields()
+    f.full_name = 'Jane'
+    f.email = 'jane@example.com'
+    f.skills = ['Python']
+    const c = profileCompleteness(f)
+    expect(c.filled).toBe(3)
+    expect(c.pct).toBe(43)
+    expect(c.missing).not.toContain('Name')
+    expect(c.missing).toContain('Experience')
+  })
+
+  it('is complete when every section has data', () => {
+    const c = profileCompleteness(toFields(fullProfile))
+    // fullProfile fixture has name/email/education/skills/languages but no summary/experience/projects
+    expect(c.missing).toEqual(expect.arrayContaining(['Summary', 'Experience', 'Projects']))
   })
 })
