@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout'
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
 import { AuthProvider } from '@/context/AuthProvider'
 import AnalyzeCV from '@/pages/AnalyzeCV'
+import Chat from '@/pages/Chat'
 import CreateCV from '@/pages/CreateCV'
 import CustomizeCV from '@/pages/CustomizeCV'
 import Dashboard from '@/pages/Dashboard'
@@ -31,6 +32,7 @@ export default function App() {
               <Route path="cvs/:id" element={<EditCV />} />
               <Route path="cvs/:id/analyze" element={<AnalyzeCV />} />
               <Route path="cvs/:id/customize" element={<CustomizeCV />} />
+              <Route path="chat" element={<Chat />} />
             </Route>
           </Route>
 

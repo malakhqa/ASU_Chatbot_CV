@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
+import { Chatbot } from '@/components/chatbot'
 import { ErrorMessage, Input, Loading } from '@/components/common'
 import { CVActions, CVEditor, CVPreview, TemplateSelector, VersionHistory } from '@/components/cv'
 import { useCV } from '@/hooks/useCV'
@@ -26,7 +27,7 @@ function draftFrom(cv: CVResponse): Draft {
 export default function EditCV() {
   const { id } = useParams<{ id: string }>()
   const cvId = Number(id)
-  const { cv, status, error, setCv } = useCV(cvId)
+  const { cv, status, error, setCv, reload: reloadCv } = useCV(cvId)
 
   const [draft, setDraft] = useState<Draft | null>(null)
   const [versions, setVersions] = useState<CVVersion[]>([])
@@ -175,6 +176,19 @@ export default function EditCV() {
         restoringNumber={restoring}
         onRestore={handleRestore}
       />
+
+      <details className="chatbot-panel">
+        <summary>Ask the AI assistant</summary>
+        <p className="muted">
+          Requests like “add Python to my skills” are applied straight to this CV as a new version.
+        </p>
+        <Chatbot
+          cvId={cvId}
+          onCvUpdated={() => {
+            if (!dirty) reloadCv()
+          }}
+        />
+      </details>
 
       <div className="cv-layout">
         <div className="cv-layout__editor">

@@ -23,3 +23,14 @@ export type {
 } from './cv'
 export type { AnalysisResponse, AnalysisResult, AnalyzeRequest } from './analysis'
 export type { CustomizeRequest, JobDescription, JobDescriptionCreate } from './job'
+export type {
+  ChatMessage,
+  ChatSendRequest,
+  ChatSendResponse,
+  ConversationResponse,
+  ConversationSummary,
+  CVAction,
+  CVActionSection,
+  CVActionVerb,
+  MessageRole,
+} from './chat'

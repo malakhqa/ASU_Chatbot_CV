@@ -19,6 +19,7 @@ frontend/
 │   │   ├── cv/                 # CVEditor, CVPreview, TemplateSelector, CVActions, VersionHistory
 │   │   ├── analyzer/           # ScoreCard, AnalysisResult, Recommendations, AnalysisPanel
 │   │   ├── jobs/               # JobDescriptionForm, JobAnalysis, CustomizedCV
+│   │   ├── chatbot/            # Chatbot, ChatMessage, ChatInput, CVActionNotification
 │   │   └── routing/            # ProtectedRoute
 │   ├── context/
 │   │   ├── authContext.ts      # createContext + types
@@ -27,7 +28,8 @@ frontend/
 │   │   ├── useAuth.ts
 │   │   ├── useProfile.ts       # load / reload the career profile
 │   │   ├── useCVs.ts           # load / reload the CV list
-│   │   └── useCV.ts            # load / reload a single CV
+│   │   ├── useCV.ts            # load / reload a single CV
+│   │   └── useChat.ts          # one conversation: optimistic send + CV-action state
 │   ├── lib/
 │   │   ├── errors.ts           # toErrorMessage()
 │   │   ├── validation.ts       # email / password / confirm validators
@@ -44,6 +46,7 @@ frontend/
 │   │   ├── cvService.ts        # list / get / create / generate / update / versions / pdf
 │   │   ├── analysisService.ts  # analyze a CV, list past analyses
 │   │   ├── jobService.ts       # jobs CRUD + POST /api/jobs/customize
+│   │   ├── chatService.ts      # send message + conversation CRUD
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
 │   ├── types/                  # API/data types mirroring backend schemas
 │   └── test/setup.ts           # jest-dom matchers
@@ -128,3 +131,18 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   panel scoped to the role. **Tailor CV for this job** → `POST /api/jobs/customize`
   → a new `job_customization` version; `CustomizedCV` previews it with "Open in
   editor" + "Download PDF".
+
+## Chatbot
+
+`useChat` drives one conversation: on send it appends an optimistic user bubble,
+POSTs `/api/chat/message`, then appends the assistant reply (rolling the optimistic
+message back on error). The reply may carry a `proposed_action` — a
+`{section, action, content}` CV edit — surfaced by `CVActionNotification`. When the
+`Chatbot` is given a `cvId`, the backend **auto-applies** valid actions as a new
+`chat_edit` version (`applied: true`, `cv_version_number`), and `onCvUpdated` lets
+the parent reload.
+
+- **`Chat`** page (`/chat`) — conversation list sidebar (`GET/DELETE
+/api/chat/conversations`) + the `Chatbot` for a career Q&A.
+- **`EditCV`** embeds `<Chatbot cvId={…} onCvUpdated={reload}>` in a collapsible
+  panel so requests like “add Python to my skills” edit the open CV directly.
