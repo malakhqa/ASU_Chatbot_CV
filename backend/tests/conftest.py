@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 import app.models  # noqa: F401  -- populate Base.metadata
+from app.core.config import settings
 from app.database import get_db
 from app.database.base import Base
 from app.main import create_app
@@ -25,10 +26,18 @@ from tests._fakes import FakeAIClient
 
 
 @pytest.fixture(autouse=True)
-def _reset_ai_client() -> Iterator[None]:
-    """Ensure no real Gemini client leaks between tests."""
+def _reset_ai_client(monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Isolate every test from any real Gemini config in ``backend/.env``.
+
+    AI starts "unconfigured" (so the 503 contract holds); tests that need a
+    working model install a ``FakeAIClient`` via the ``fake_ai`` fixture, which
+    ``get_ai_client()`` returns before the key check.
+    """
+    monkeypatch.setattr(settings, "gemini_api_key", "")
+    ai_service._real_client.cache_clear()
     yield
     ai_service.set_ai_client(None)
+    ai_service._real_client.cache_clear()
 
 
 @pytest.fixture

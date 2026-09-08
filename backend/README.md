@@ -107,7 +107,12 @@ shapes live in `app/schemas/profile.py` and are reused by the CV content schema.
 (`google-genai`, model `gemini-2.0-flash`). Everything else calls
 `ai_service.generate_text(...)` / `generate_structured(prompt, PydanticSchema, ...)`
 or takes the `AI` FastAPI dependency (`app.core.dependencies`), which returns
-**503** when `GEMINI_API_KEY` is unset.
+**503** when `GEMINI_API_KEY` is **empty**.
+
+> Keep `GEMINI_API_KEY=` empty in `.env` until you have a real key. A non-empty
+> placeholder makes the app think AI is configured, so generate / analyze / chat
+> return a confusing **502** (bad key) instead of a clean **503**. The test suite
+> forces it empty regardless of `.env` (autouse fixture in `tests/conftest.py`).
 
 - **Structured output**: pass a Pydantic model as `schema`; the wrapper sets
   `response_mime_type=application/json` + `response_schema` and validates the

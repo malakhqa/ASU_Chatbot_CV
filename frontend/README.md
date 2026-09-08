@@ -12,10 +12,11 @@ frontend/
 │   ├── App.tsx                  # BrowserRouter + AuthProvider + routes
 │   ├── config.ts               # API_BASE_URL from VITE_API_BASE_URL
 │   ├── components/
-│   │   ├── common/             # Button, Input, TextArea, Modal, Loading,
+│   │   ├── common/             # Button, Input, TextArea, Select, Modal, Loading,
 │   │   │                       #   ErrorMessage, TagsInput, RepeatableList
 │   │   ├── layout/             # Navbar, Sidebar, DashboardLayout
-│   │   ├── profile/            # Section + one *Form per profile section
+│   │   ├── profile/            # Section + one *Form per profile section (reused by cv/)
+│   │   ├── cv/                 # CVEditor, CVPreview, TemplateSelector, CVActions, VersionHistory
 │   │   └── routing/            # ProtectedRoute
 │   ├── context/
 │   │   ├── authContext.ts      # createContext + types
@@ -23,13 +24,15 @@ frontend/
 │   ├── hooks/
 │   │   ├── useAuth.ts
 │   │   ├── useProfile.ts       # load / reload the career profile
-│   │   └── useCVs.ts           # load / reload the CV list
+│   │   ├── useCVs.ts           # load / reload the CV list
+│   │   └── useCV.ts            # load / reload a single CV
 │   ├── lib/
 │   │   ├── errors.ts           # toErrorMessage()
 │   │   ├── validation.ts       # email / password / confirm validators
 │   │   ├── profile.ts          # toFields / cleanProfilePayload / isDirty
-│   │   ├── cv.ts               # CV_TEMPLATES, templateLabel
-│   │   └── format.ts           # formatDate
+│   │   ├── cv.ts               # CV_TEMPLATES, templateLabel, emptyCVContent
+│   │   ├── format.ts           # formatDate
+│   │   └── download.ts         # saveBlob, filenameFromDisposition
 │   ├── pages/                  # Login, Register, Profile, MyCVs, CreateCV, EditCV*; Dashboard, NotFound (stubs)
 │   ├── services/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
@@ -102,5 +105,11 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   profile** (`POST /api/cv/generate` — AI draft; **503** shows "AI service is not
   configured", so the user can still start blank) or **Start blank**
   (`POST /api/cv`). On success it routes to `/cvs/:id`.
-- **`EditCV`** is a placeholder that loads the CV (`GET /api/cv/:id`) and shows its
-  meta + summary/skills — the full section editor + live preview land in Task 18.
+- **`EditCV`** (`/cvs/:id`) is the editor: a toolbar (title, `TemplateSelector`,
+  `CVActions`), a collapsible `VersionHistory` with restore, and a two-pane
+  `CVEditor` + live `CVPreview`. The section forms are the same components as the
+  profile editor. **Save** sends `{title, template}` in place and only adds
+  `content` to the payload when the body actually changed (so a title tweak
+  doesn't spawn a version). **Download PDF** (`GET /api/cv/:id/pdf`, blob) is
+  disabled while there are unsaved edits. Loaded state lives in a single
+  `draft | null` so the editor never flashes an empty frame.

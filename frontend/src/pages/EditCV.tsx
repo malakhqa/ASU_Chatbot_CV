@@ -1,40 +1,133 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
-import { ErrorMessage, Loading } from '@/components/common'
-import { templateLabel } from '@/lib/cv'
+import { ErrorMessage, Input, Loading } from '@/components/common'
+import { CVActions, CVEditor, CVPreview, TemplateSelector, VersionHistory } from '@/components/cv'
+import { useCV } from '@/hooks/useCV'
+import { emptyCVContent } from '@/lib/cv'
+import { saveBlob } from '@/lib/download'
 import { cvService } from '@/services/cvService'
-import type { CVResponse } from '@/types'
+import type { CVContent, CVResponse, CVUpdateRequest, CVVersion } from '@/types'
 
-// Placeholder — the full section editor + preview arrive in Task 18.
+interface Draft {
+  title: string
+  template: string
+  content: CVContent
+}
+
+function draftFrom(cv: CVResponse): Draft {
+  return {
+    title: cv.title,
+    template: cv.template,
+    content: cv.current_version?.content ?? emptyCVContent(),
+  }
+}
+
 export default function EditCV() {
   const { id } = useParams<{ id: string }>()
-  const [cv, setCv] = useState<CVResponse | null>(null)
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
-  const [error, setError] = useState<unknown>(null)
+  const cvId = Number(id)
+  const { cv, status, error, setCv } = useCV(cvId)
+
+  const [draft, setDraft] = useState<Draft | null>(null)
+  const [versions, setVersions] = useState<CVVersion[]>([])
+
+  const [saving, setSaving] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const [restoring, setRestoring] = useState<number | null>(null)
+  const [saved, setSaved] = useState(false)
+  const [actionError, setActionError] = useState<unknown>(null)
+
+  // Seed / reset the draft whenever the loaded CV changes.
+  useEffect(() => {
+    if (cv) setDraft(draftFrom(cv))
+  }, [cv])
+
+  const loadVersions = useCallback(() => {
+    cvService
+      .listVersions(cvId)
+      .then(setVersions)
+      .catch(() => setVersions([]))
+  }, [cvId])
 
   useEffect(() => {
-    let cancelled = false
-    setStatus('loading')
-    cvService
-      .get(Number(id))
-      .then((c) => {
-        if (cancelled) return
-        setCv(c)
-        setStatus('ready')
-      })
-      .catch((e) => {
-        if (cancelled) return
-        setError(e)
-        setStatus('error')
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [id])
+    if (cv) loadVersions()
+  }, [cv, loadVersions])
 
-  if (status === 'loading') return <Loading label="Loading CV…" />
-  if (status === 'error' || !cv) {
+  const savedSnapshot = useMemo(() => (cv ? draftFrom(cv) : null), [cv])
+  const contentDirty = Boolean(
+    draft &&
+    savedSnapshot &&
+    JSON.stringify(draft.content) !== JSON.stringify(savedSnapshot.content),
+  )
+  const dirty = Boolean(
+    draft &&
+    savedSnapshot &&
+    (draft.title !== savedSnapshot.title ||
+      draft.template !== savedSnapshot.template ||
+      contentDirty),
+  )
+
+  const patchDraft = (patch: Partial<Draft>) => {
+    setDraft((d) => (d ? { ...d, ...patch } : d))
+    setSaved(false)
+  }
+  const patchContent = (patch: Partial<CVContent>) =>
+    setDraft((d) => {
+      if (!d) return d
+      setSaved(false)
+      return { ...d, content: { ...d.content, ...patch } }
+    })
+
+  const handleSave = async () => {
+    if (!draft) return
+    setSaving(true)
+    setActionError(null)
+    try {
+      const payload: CVUpdateRequest = { title: draft.title.trim(), template: draft.template }
+      if (contentDirty) payload.content = draft.content
+      const updated = await cvService.update(cvId, payload)
+      setCv(updated)
+      setSaved(true)
+      loadVersions()
+    } catch (e) {
+      setActionError(e)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDownload = async () => {
+    if (!draft) return
+    setDownloading(true)
+    setActionError(null)
+    try {
+      const { blob, filename } = await cvService.downloadPdf(
+        cvId,
+        `${draft.title.trim() || 'cv'}.pdf`,
+      )
+      saveBlob(blob, filename)
+    } catch (e) {
+      setActionError(e)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const handleRestore = async (versionNumber: number) => {
+    setRestoring(versionNumber)
+    setActionError(null)
+    try {
+      const updated = await cvService.restoreVersion(cvId, versionNumber)
+      setCv(updated)
+      loadVersions()
+    } catch (e) {
+      setActionError(e)
+    } finally {
+      setRestoring(null)
+    }
+  }
+
+  if (status === 'error' || (status === 'ready' && !cv)) {
     return (
       <section className="page">
         <Link to="/cvs">&larr; My CVs</Link>
@@ -42,37 +135,49 @@ export default function EditCV() {
       </section>
     )
   }
-
-  const content = cv.current_version?.content
+  if (!cv || !draft) return <Loading label="Loading CV…" />
 
   return (
     <section className="page">
       <Link to="/cvs">&larr; My CVs</Link>
-      <div className="page__header">
-        <div>
-          <h1>{cv.title}</h1>
-          <p className="muted">
-            {templateLabel(cv.template)} &middot; v{cv.current_version_number ?? 1} &middot;{' '}
-            {cv.current_version?.source ?? 'empty'}
-          </p>
-        </div>
-        <span className="badge">Editor arrives in Task 18</span>
+
+      <div className="cv-toolbar">
+        <Input
+          label="CV title"
+          value={draft.title}
+          onChange={(e) => patchDraft({ title: e.target.value })}
+        />
+        <TemplateSelector
+          value={draft.template}
+          onChange={(template) => patchDraft({ template })}
+        />
+        <CVActions
+          dirty={dirty}
+          saving={saving}
+          downloading={downloading}
+          saved={saved}
+          onSave={handleSave}
+          onDownload={handleDownload}
+        />
       </div>
 
-      {content ? (
-        <div className="profile-section">
-          <h2>Summary</h2>
-          <p>{content.summary || <span className="muted">— empty —</span>}</p>
-          <h2>Skills</h2>
-          <p>
-            {content.skills.length ? (
-              content.skills.join(', ')
-            ) : (
-              <span className="muted">— none —</span>
-            )}
-          </p>
+      <ErrorMessage error={actionError} />
+
+      <VersionHistory
+        versions={versions}
+        currentNumber={cv.current_version_number}
+        restoringNumber={restoring}
+        onRestore={handleRestore}
+      />
+
+      <div className="cv-layout">
+        <div className="cv-layout__editor">
+          <CVEditor content={draft.content} onChange={patchContent} />
         </div>
-      ) : null}
+        <aside className="cv-layout__preview">
+          <CVPreview content={draft.content} template={draft.template} />
+        </aside>
+      </div>
     </section>
   )
 }

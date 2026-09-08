@@ -29,6 +29,8 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        # so the browser can read the PDF download filename
+        expose_headers=["Content-Disposition"],
     )
 
     # Routers. The /api prefix is applied here so routers stay prefix-agnostic.

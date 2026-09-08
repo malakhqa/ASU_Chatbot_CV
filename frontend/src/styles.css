@@ -433,3 +433,117 @@ a {
   margin: 0.6rem 0 1rem;
   flex-wrap: wrap;
 }
+
+/* --- CV editor --- */
+.cv-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin: 0.6rem 0 1rem;
+}
+.cv-toolbar .field {
+  margin-bottom: 0;
+}
+.cv-toolbar > .field:first-child {
+  flex: 1;
+  min-width: 200px;
+}
+.cv-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.2rem;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .cv-layout {
+    grid-template-columns: 1fr;
+  }
+}
+.cv-layout__preview {
+  position: sticky;
+  top: 1rem;
+}
+
+.cv-preview {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.cv-preview__header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+.cv-preview__contact {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.cv-preview section {
+  margin-top: 1rem;
+}
+.cv-preview h2 {
+  font-size: 0.95rem;
+  color: var(--accent);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.15rem;
+  margin: 0 0 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.cv-preview p {
+  margin: 0.25rem 0;
+}
+.cv-preview ul {
+  margin: 0.2rem 0 0.4rem;
+  padding-left: 1.1rem;
+}
+.cv-preview__entry {
+  margin-bottom: 0.6rem;
+}
+.cv-preview__entry-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.cv-preview__meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.version-history {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1rem;
+}
+.version-history summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.version-history ul {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+}
+.version-history__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.45rem 0;
+  border-top: 1px solid var(--border);
+}
