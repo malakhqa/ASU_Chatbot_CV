@@ -1,0 +1,7 @@
+# Keep container/shell files LF-only so they run inside Linux images
+# regardless of the host that checked them out.
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.dockerfile    text eol=lf
+docker-entrypoint.sh text eol=lf
+nginx.conf      text eol=lf

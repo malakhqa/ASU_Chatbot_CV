@@ -25,7 +25,9 @@ backend/
 ├── requirements-dev.txt
 ├── pyproject.toml       # ruff + pytest config
 ├── .env                 # local secrets (gitignored) — copy from .env.example
-└── Dockerfile           # Task 23
+├── .dockerignore
+├── docker-entrypoint.sh # runs `alembic upgrade head`, then uvicorn
+└── Dockerfile           # python:3.12-slim, non-root, stdlib healthcheck
 ```
 
 ## Setup
@@ -49,6 +51,27 @@ uvicorn app.main:app --reload --port 8000
 - API root:  http://localhost:8000/
 - Health:    http://localhost:8000/api/health
 - Docs:      http://localhost:8000/docs
+
+## Docker
+
+The image is `python:3.12-slim`, installs `requirements.txt`, copies the app, and
+runs as a non-root user. `docker-entrypoint.sh` applies `alembic upgrade head`
+(retrying while MySQL finishes starting) and then launches
+`uvicorn app.main:app --host 0.0.0.0 --port 8000`. A stdlib `HEALTHCHECK` polls
+`/api/health`.
+
+Config comes entirely from environment variables — `.dockerignore` keeps `.env`,
+`tests/`, and caches out of the image. Normally run via the root
+`docker compose up --build`, which supplies `DATABASE_URL` (host `mysql`),
+`JWT_SECRET_KEY`, `GEMINI_API_KEY`, etc. from the root `.env`. Standalone:
+
+```bash
+docker build -t aica-backend ./backend
+docker run --rm -p 8000:8000 \
+  -e DATABASE_URL='mysql+pymysql://career:change-me@host.docker.internal:3306/career_assistant' \
+  -e JWT_SECRET_KEY='...' -e GEMINI_API_KEY='' \
+  aica-backend
+```
 
 ## Database & migrations
 

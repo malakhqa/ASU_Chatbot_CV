@@ -55,13 +55,16 @@ frontend/
 ├── eslint.config.js            # flat config (ESLint 9 + typescript-eslint)
 ├── .prettierrc.json
 ├── vite.config.ts              # react plugin, `@` alias, /api dev proxy, vitest
+├── nginx.conf                  # prod: serve SPA + reverse-proxy /api → backend
+├── .dockerignore
+├── Dockerfile                  # node build stage → nginx serve stage
 └── .env.example
 ```
 
 ## Prerequisites
 
-**Node.js 20+ and npm** (not currently installed on this machine — install from
-<https://nodejs.org/> or via nvm/fnm).
+**Node.js 20+ and npm** — install from <https://nodejs.org/> or via nvm/fnm.
+(Not needed if you only run the stack through Docker.)
 
 ## Setup & run
 
@@ -74,6 +77,24 @@ npm run dev                       # http://localhost:5173
 
 Start the backend first (`cd ../backend && uvicorn app.main:app --reload`). In dev,
 requests to `/api` are proxied to `VITE_API_BASE_URL` (default `http://localhost:8000`).
+
+## Docker
+
+Two-stage build: `node:20-alpine` runs `npm ci && npm run build`, then
+`nginx:1.27-alpine` serves the static `dist/` and reverse-proxies `/api/` to the
+`backend` service (see `nginx.conf`). Because the API is same-origin through
+nginx, the bundle is built with an **empty** `VITE_API_BASE_URL` (build arg) so
+the axios client calls `/api` — no CORS, and the backend port need not be
+published. `nginx` also does SPA history fallback (`try_files … /index.html`) and
+long-caches `/assets/`.
+
+Built and run by the root `docker compose up --build`. Standalone:
+
+```bash
+docker build -t aica-frontend ./frontend           # same-origin /api (needs the proxy target)
+docker build -t aica-frontend --build-arg VITE_API_BASE_URL=http://localhost:8000 ./frontend
+docker run --rm -p 5173:80 aica-frontend
+```
 
 ## Scripts
 

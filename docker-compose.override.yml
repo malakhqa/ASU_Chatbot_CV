@@ -1,0 +1,16 @@
+# ============================================================
+# Local-development overrides. docker-compose automatically merges this
+# file on top of docker-compose.yml, so `docker compose up` picks it up.
+#
+# It publishes MySQL on the LOOPBACK interface only (127.0.0.1) so tools
+# like MySQL Workbench can connect during development. It is never a public
+# exposure. For a production-style run that keeps the database fully
+# internal, opt out of this file explicitly:
+#
+#   docker compose -f docker-compose.yml up --build
+# ============================================================
+
+services:
+  mysql:
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-3306}:3306"

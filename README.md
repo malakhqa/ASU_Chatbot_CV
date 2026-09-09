@@ -18,11 +18,12 @@ See [`Documentation/`](Documentation/) for the full business and technical specs
 
 ```text
 ai-career-assistant/
-├── backend/            # FastAPI application (Python)
-├── frontend/           # React + TypeScript application (Vite)
-├── Documentation/      # Business & technical documentation
-├── docker-compose.yml  # mysql (usable now) + backend/frontend (Task 23)
-├── .env.example        # Root env template for docker-compose
+├── backend/                    # FastAPI application (Python) + Dockerfile
+├── frontend/                   # React + TypeScript (Vite) + Dockerfile + nginx.conf
+├── Documentation/              # Business & technical documentation
+├── docker-compose.yml          # mysql + backend + frontend (full stack)
+├── docker-compose.override.yml # dev-only: publishes MySQL on 127.0.0.1
+├── .env.example                # Root env template for docker-compose
 └── README.md
 ```
 
@@ -33,9 +34,33 @@ ai-career-assistant/
 - Docker Desktop (for MySQL and full-stack runs)
 - A Google Gemini API key
 
-## Getting started (local development)
+## Run the whole stack with Docker
 
-> The stack is being built task by task. Steps below grow as tasks land.
+The fastest way to run everything — MySQL, the API, and the web app:
+
+```bash
+cp .env.example .env          # then edit: set a real GEMINI_API_KEY, strong passwords
+docker compose up --build
+```
+
+Then open <http://localhost:5173>. The backend applies its database migrations
+automatically on start, so the first boot is ready to use once the containers
+report healthy.
+
+| URL                            | What                                            |
+| ------------------------------ | ----------------------------------------------- |
+| <http://localhost:5173>        | Web app (nginx serves the SPA, proxies `/api`)  |
+| <http://localhost:8000/docs>   | API docs (published for convenience/debugging)  |
+| MySQL                          | **not** published by the base compose file      |
+
+- `docker compose up --build` also merges `docker-compose.override.yml`, which
+  publishes MySQL on `127.0.0.1:3306` for local tools like MySQL Workbench.
+- For a production-style run with the database fully internal:
+  `docker compose -f docker-compose.yml up --build`.
+- `ENVIRONMENT=production` in `.env` makes the API refuse to start unless
+  `JWT_SECRET_KEY` and `DATABASE_URL` are real values.
+
+## Getting started (local development without Docker for the app)
 
 1. **Clone & configure**
 
@@ -112,5 +137,5 @@ ai-career-assistant/
 - [x] Task 20 — Job customization UI
 - [x] Task 21 — Chatbot UI
 - [x] Task 22 — Dashboard
-- [ ] Task 23 — Dockerization
+- [x] Task 23 — Dockerization
 - [ ] Task 24 — End-to-end pass
