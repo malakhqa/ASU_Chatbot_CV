@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { Input, Select, TextArea } from '@/components/common'
 import type { JobDraft } from '@/lib/job'
 import { validateRequired } from '@/lib/validation'
@@ -11,6 +13,7 @@ export interface JobDescriptionFormProps {
 
 export function JobDescriptionForm({ savedJobs, draft, onChange }: JobDescriptionFormProps) {
   const usingSaved = draft.savedId != null
+  const [titleTouched, setTitleTouched] = useState(false)
 
   return (
     <div className="profile-section">
@@ -36,7 +39,12 @@ export function JobDescriptionForm({ savedJobs, draft, onChange }: JobDescriptio
               label="Job title"
               value={draft.title}
               onChange={(e) => onChange({ title: e.target.value })}
-              error={draft.title.trim() ? undefined : validateRequired(draft.title, 'Job title')}
+              onBlur={() => setTitleTouched(true)}
+              error={
+                titleTouched && !draft.title.trim()
+                  ? validateRequired(draft.title, 'Job title')
+                  : undefined
+              }
             />
             <Input
               label="Company"

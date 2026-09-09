@@ -93,6 +93,27 @@ report healthy.
    npm run dev   # http://localhost:5173
    ```
 
+## Using the app (end-to-end)
+
+1. **Register** at `/register` — an empty career profile is created for you.
+2. **Fill your career profile** (`/profile`): summary, skills, experience,
+   education, projects. The dashboard shows how complete it is.
+3. **Create a CV** (`/cvs/new`): **Generate from my profile** (AI drafts one) or
+   **Start blank**. Every content change is saved as a new version — nothing is
+   overwritten, and you can restore any earlier version.
+4. **Analyse** a CV (`/cvs/:id/analyze`) for a 0–100 score with strengths,
+   weaknesses, and concrete fixes.
+5. **Tailor** a CV to a job (`/cvs/:id/customize`): paste a posting, then
+   **Analyze match** or **Tailor CV for this job** (rewrites and reorders your
+   existing content — it never invents experience).
+6. **Chat** (`/chat`, or the panel inside the CV editor): ask career questions,
+   or say “add Docker to my skills” to apply an edit as a new version.
+7. **Download PDF** from the CV editor at any time.
+
+If `GEMINI_API_KEY` is empty, the AI steps return a clear “AI service is not
+configured” message and you can still build CVs by hand. If the key is rate-
+limited or the model is busy, the app says so and no partial data is saved.
+
 ## Development conventions
 
 | Area              | Tool                                             |
@@ -138,4 +159,4 @@ report healthy.
 - [x] Task 21 — Chatbot UI
 - [x] Task 22 — Dashboard
 - [x] Task 23 — Dockerization
-- [ ] Task 24 — End-to-end pass
+- [x] Task 24 — End-to-end pass

@@ -74,6 +74,21 @@ def test_cv_action_add_skill_is_applied(auth_client: TestClient) -> None:
     assert cv["current_version"]["source"] == "chat_edit"
 
 
+def test_cv_action_add_multiple_skills_is_applied(auth_client: TestClient) -> None:
+    """'add Docker and Git to my skills' — the model returns a list payload."""
+    cv_id = _new_cv(auth_client)
+    _fake_turn(
+        reply="Added Docker and Git.",
+        cv_action={"section": "skills", "action": "add", "content": ["Docker", "Git"]},
+    )
+    resp = auth_client.post(MESSAGE, json={"message": "add docker and git", "cv_id": cv_id})
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["applied"] is True
+
+    cv = auth_client.get(f"/api/cv/{cv_id}").json()
+    assert cv["current_version"]["content"]["skills"] == ["Docker", "Git"]
+
+
 def test_cv_action_replace_summary(auth_client: TestClient) -> None:
     cv_id = _new_cv(auth_client)
     _fake_turn(

@@ -69,6 +69,22 @@ describe('<AnalyzeCV />', () => {
     expect(within(recs).getByText('Quantify achievements')).toBeInTheDocument()
   })
 
+  it('replaces the empty state with a loading indicator while the first run is in flight', async () => {
+    listForCv.mockResolvedValue([])
+    let resolve!: (a: AnalysisResponse) => void
+    analyze.mockReturnValue(new Promise<AnalysisResponse>((r) => (resolve = r)))
+    const user = userEvent.setup()
+    setup()
+
+    await user.click(await screen.findByRole('button', { name: /run analysis/i }))
+
+    expect(screen.queryByText(/no analysis yet/i)).not.toBeInTheDocument()
+    expect(screen.getByText(/analysing your cv/i)).toBeInTheDocument()
+
+    resolve(analysis())
+    expect(await screen.findByText('72')).toBeInTheDocument()
+  })
+
   it('renders the most recent past analysis on load', async () => {
     listForCv.mockResolvedValue([analysis({ id: 9, score: 88 })])
     setup()

@@ -104,6 +104,8 @@ export default function AnalyzeCV() {
           <AnalysisPanel analysis={current} />
           <PastAnalyses items={history} activeId={current.id} onSelect={setCurrent} />
         </>
+      ) : running ? (
+        <Loading label="Analysing your CV…" />
       ) : (
         <div className="empty-state">
           <p>No analysis yet.</p>

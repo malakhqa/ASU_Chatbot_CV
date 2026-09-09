@@ -126,7 +126,12 @@ def apply_cv_action(content: CVContent, action: CVAction) -> CVContent:
     elif verb == "add":
         if payload is None:
             raise InvalidCVActionError("'add' requires content")
-        items.append(payload)
+        # "add Docker and Git to my skills" arrives as a list — append each item,
+        # not the list as a single element.
+        if isinstance(payload, list):
+            items.extend(payload)
+        else:
+            items.append(payload)
     elif verb == "update":
         if isinstance(payload, list):
             items = payload

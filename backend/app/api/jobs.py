@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
+from app.api.errors import ai_http_exception
 from app.core.dependencies import AI, CurrentUser
 from app.database import get_db
 from app.schemas.cv import CVResponse
@@ -46,10 +47,7 @@ def customize_cv(
             status_code=status.HTTP_404_NOT_FOUND, detail="Job description not found"
         ) from None
     except AIError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=f"CV customization failed: {exc}",
-        ) from exc
+        raise ai_http_exception(exc) from exc
     return cv_service.to_response(db, cv)
 
 
