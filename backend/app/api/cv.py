@@ -13,6 +13,7 @@ from app.core.dependencies import AI, CurrentUser
 from app.database import get_db
 from app.models import CV, User
 from app.schemas.analysis import AnalysisResponse, AnalyzeRequest
+from app.schemas.ats import ATSCheckRequest, ATSResult
 from app.schemas.cv import (
     CVContent,
     CVCreateRequest,
@@ -21,7 +22,7 @@ from app.schemas.cv import (
     CVUpdateRequest,
     CVVersionResponse,
 )
-from app.services import analysis_service, cv_service, pdf_service
+from app.services import analysis_service, ats_service, cv_service, pdf_service
 from app.services.ai_service import AIError
 from app.services.job_service import JobNotFoundError
 
@@ -78,6 +79,25 @@ def analyze_cv(
     except AIError as exc:
         raise ai_http_exception(exc) from exc
     return AnalysisResponse.model_validate(analysis)
+
+
+@router.post("/ats-check", response_model=ATSResult)
+def ats_check(
+    payload: ATSCheckRequest, current_user: CurrentUser, db: DbSession, ai: AI
+) -> ATSResult:
+    """Evaluate the CV's Applicant Tracking System readiness. Stateless."""
+    try:
+        return ats_service.check_ats(
+            db, current_user, ai, payload.cv_id, payload.job_description_id
+        )
+    except cv_service.CVNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV not found") from None
+    except JobNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job description not found"
+        ) from None
+    except AIError as exc:
+        raise ai_http_exception(exc) from exc
 
 
 @router.get("/{cv_id}", response_model=CVResponse)

@@ -10,7 +10,7 @@ backend/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
 │   ├── api/             # routers: health, auth, profile, cv, jobs, chat
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
-│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, job, chatbot, pdf
+│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, ats, job, chatbot, pdf
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -180,6 +180,17 @@ the model's output — a guard against hallucinated contact details.
 
 `AnalysisResult` shape (what the model returns and what's stored in `results`):
 `score` (0–100), `strengths[]`, `weaknesses[]`, `missing[]`, `recommendations[]`.
+
+### ATS optimization check
+
+| Method | Path                | Body            | Notes |
+| ------ | ------------------- | --------------- | ----- |
+| POST   | `/api/cv/ats-check` | `ATSCheckRequest` (`cv_id`, optional `job_description_id`) | Rates how cleanly an Applicant Tracking System can parse the CV → `ATSResult` (200, **stateless** — nothing stored); 404 unknown CV/job, 502/503 as above |
+
+`ATSResult`: `score` (0–100), `passed[]` (checks the CV already meets),
+`findings[]` (`{category, severity, message}` — category is one of `keywords`,
+`sections`, `formatting`, `relevance`, `content`; severity `high`/`medium`/`low`),
+`recommendations[]`. Handled by `app/services/ats_service.py`.
 
 ## Jobs & customization
 

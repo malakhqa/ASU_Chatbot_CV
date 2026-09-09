@@ -1,0 +1,6 @@
+dist
+coverage
+node_modules
+
+# Tooling caches (not authored source)
+.impeccable

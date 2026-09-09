@@ -18,6 +18,7 @@ frontend/
 │   │   ├── profile/            # Section + one *Form per profile section (reused by cv/)
 │   │   ├── cv/                 # CVEditor, CVPreview, TemplateSelector, CVActions, VersionHistory
 │   │   ├── analyzer/           # ScoreCard, AnalysisResult, Recommendations, AnalysisPanel
+│   │   ├── ats/                # ATSResultPanel (ATS-readiness check)
 │   │   ├── jobs/               # JobDescriptionForm, JobAnalysis, CustomizedCV
 │   │   ├── chatbot/            # Chatbot, ChatMessage, ChatInput, CVActionNotification
 │   │   ├── dashboard/          # ProfileStatusCard, RecentCVsCard
@@ -40,13 +41,14 @@ frontend/
 │   │   ├── format.ts           # formatDate
 │   │   └── download.ts         # saveBlob, filenameFromDisposition
 │   ├── pages/                  # Login, Register, Dashboard, Profile, MyCVs, CreateCV,
-│   │                           #   EditCV, AnalyzeCV, CustomizeCV, Chat; NotFound
+│   │                           #   EditCV, AnalyzeCV, ATSCheck, CustomizeCV, Chat; NotFound
 │   ├── services/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
 │   │   ├── authService.ts
 │   │   ├── profileService.ts   # GET / PUT /api/profile
 │   │   ├── cvService.ts        # list / get / create / generate / update / versions / pdf
 │   │   ├── analysisService.ts  # analyze a CV, list past analyses
+│   │   ├── atsService.ts       # POST /api/cv/ats-check (stateless)
 │   │   ├── jobService.ts       # jobs CRUD + POST /api/jobs/customize
 │   │   ├── chatService.ts      # send message + conversation CRUD
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
@@ -54,6 +56,7 @@ frontend/
 │   └── test/setup.ts           # jest-dom matchers
 ├── eslint.config.js            # flat config (ESLint 9 + typescript-eslint)
 ├── .prettierrc.json
+├── .prettierignore             # dist / coverage / tooling caches
 ├── vite.config.ts              # react plugin, `@` alias, /api dev proxy, vitest
 ├── nginx.conf                  # prod: serve SPA + reverse-proxy /api → backend
 ├── .dockerignore
@@ -148,6 +151,10 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   result: `ScoreCard` (0–100, banded), `AnalysisResult` (strengths / weaknesses /
   missing), `Recommendations`. Past analyses (`GET /api/cv/:id/analyses`) load on
   mount; the most recent shows first and older ones are switchable.
+- **`ATSCheck`** (`/cvs/:id/ats`) runs `POST /api/cv/ats-check` (stateless) and
+  renders `ATSResultPanel`: `ScoreCard`, passing checks, findings sorted by
+  severity (each tagged with a category — keywords / sections / formatting /
+  relevance / content), and `Recommendations`.
 - **`CustomizeCV`** (`/cvs/:id/customize`) — pick a saved job or paste a new one
   (a new one is saved via `POST /api/jobs` before use, since analyze needs an id).
   **Analyze match** → `POST /api/cv/analyze` with the job id → reuses the analyzer

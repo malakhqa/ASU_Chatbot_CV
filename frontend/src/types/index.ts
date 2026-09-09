@@ -22,6 +22,7 @@ export type {
   CVVersionSource,
 } from './cv'
 export type { AnalysisResponse, AnalysisResult, AnalyzeRequest } from './analysis'
+export type { ATSCategory, ATSCheckRequest, ATSFinding, ATSResult, ATSSeverity } from './ats'
 export type { CustomizeRequest, JobDescription, JobDescriptionCreate } from './job'
 export type {
   ChatMessage,

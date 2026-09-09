@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from app.schemas.analysis import AnalysisResponse, AnalysisResult, AnalyzeRequest
+from app.schemas.ats import ATSCheckRequest, ATSFinding, ATSResult
 from app.schemas.auth import (
     LoginRequest,
     RegisterRequest,
@@ -60,4 +61,7 @@ __all__ = [
     "AnalyzeRequest",
     "AnalysisResult",
     "AnalysisResponse",
+    "ATSCheckRequest",
+    "ATSFinding",
+    "ATSResult",
 ]

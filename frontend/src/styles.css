@@ -923,3 +923,49 @@ a {
 .dash-actions .btn {
   text-decoration: none;
 }
+
+/* --- ats check --- */
+.ats-findings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.ats-finding {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 0.4rem 0.5rem;
+  align-items: baseline;
+  font-size: 0.9rem;
+}
+.ats-finding__sev {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  color: var(--accent-contrast);
+}
+.ats-finding__sev--high {
+  background: var(--danger);
+}
+.ats-finding__sev--medium {
+  background: #b8860b;
+}
+.ats-finding__sev--low {
+  background: var(--muted);
+}
+.ats-finding__cat {
+  font-size: 0.75rem;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.05rem 0.45rem;
+  text-transform: capitalize;
+}
+.ats-finding__msg {
+  grid-column: 3;
+}
