@@ -132,8 +132,24 @@ export function CVPreview({ content, template }: CVPreviewProps) {
         </section>
       ) : null}
 
-      {content.experience.length ? <Experience items={content.experience} /> : null}
-      {content.education.length ? <Education items={content.education} /> : null}
+      {(() => {
+        const experience = content.experience.length ? (
+          <Experience items={content.experience} />
+        ) : null
+        const education = content.education.length ? <Education items={content.education} /> : null
+        // Academic CVs lead with education.
+        return template === 'academic' ? (
+          <>
+            {education}
+            {experience}
+          </>
+        ) : (
+          <>
+            {experience}
+            {education}
+          </>
+        )
+      })()}
       {content.projects.length ? <Projects items={content.projects} /> : null}
 
       {content.skills.length ? (

@@ -45,6 +45,32 @@ def test_render_cv_pdf_returns_pdf_bytes() -> None:
     assert len(full) > len(empty)
 
 
+def test_every_template_renders_and_is_distinct() -> None:
+    content = CVContent.model_validate(RICH_CONTENT)
+    names = pdf_service.available_templates()
+    assert set(names) == {"professional", "modern", "minimal", "academic", "creative"}
+
+    rendered = {
+        n: pdf_service.render_cv_pdf(cv_title="X", content=content, template=n) for n in names
+    }
+    for name, pdf in rendered.items():
+        assert pdf[:5] == b"%PDF-" and b"%%EOF" in pdf, name
+
+    # each non-default template differs from the professional baseline
+    baseline = rendered["professional"]
+    for name in ("modern", "minimal", "academic", "creative"):
+        assert rendered[name] != baseline, name
+
+
+def test_unknown_template_falls_back_to_professional() -> None:
+    content = CVContent.model_validate(RICH_CONTENT)
+    fallback = pdf_service.render_cv_pdf(cv_title="X", content=content, template="nope")
+    professional = pdf_service.render_cv_pdf(cv_title="X", content=content, template="professional")
+    # same layout spec -> same output size (bytes can differ by an embedded timestamp)
+    assert fallback[:5] == b"%PDF-"
+    assert len(fallback) == len(professional)
+
+
 def test_pdf_endpoint_requires_auth(client: TestClient) -> None:
     assert client.get("/api/cv/1/pdf").status_code == 401
 

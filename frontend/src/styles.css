@@ -472,6 +472,19 @@ a {
 }
 
 .cv-preview {
+  /* Per-template knobs — overridden by the .cv-preview--<name> variants below.
+     These defaults are the "professional" look. */
+  --cv-accent: var(--accent);
+  --cv-rule: var(--border);
+  --cv-name-size: 1.4rem;
+  --cv-name-size-mult: 1;
+  --cv-align: left;
+  --cv-heading-border: 1px solid var(--cv-rule);
+  --cv-heading-transform: uppercase;
+  --cv-heading-spacing: 0.03em;
+  --cv-header-border: 2px solid var(--cv-accent);
+  --cv-section-gap: 1rem;
+
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -479,10 +492,15 @@ a {
   font-size: 0.9rem;
   line-height: 1.5;
 }
+.cv-preview__header {
+  text-align: var(--cv-align);
+  border-bottom: var(--cv-header-border);
+  padding-bottom: 0.5rem;
+}
 .cv-preview__header h1 {
   margin: 0;
-  font-size: 1.4rem;
-  color: var(--accent);
+  font-size: calc(var(--cv-name-size) * var(--cv-name-size-mult));
+  color: var(--cv-accent);
 }
 .cv-preview__contact {
   margin: 0.2rem 0 0;
@@ -490,16 +508,59 @@ a {
   font-size: 0.82rem;
 }
 .cv-preview section {
-  margin-top: 1rem;
+  margin-top: var(--cv-section-gap);
 }
 .cv-preview h2 {
   font-size: 0.95rem;
-  color: var(--accent);
-  border-bottom: 1px solid var(--border);
+  color: var(--cv-accent);
+  border-bottom: var(--cv-heading-border);
   padding-bottom: 0.15rem;
   margin: 0 0 0.4rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  text-transform: var(--cv-heading-transform);
+  letter-spacing: var(--cv-heading-spacing);
+}
+
+/* --- template variants (mirror backend pdf_service specs) --- */
+.cv-preview--modern {
+  --cv-accent: #0f766e;
+  --cv-rule: #99e2d8;
+  --cv-name-size-mult: 1.18;
+  --cv-heading-border: none;
+  --cv-heading-spacing: 0.14em;
+  --cv-header-border: 3px solid var(--cv-accent);
+  --cv-section-gap: 1.35rem;
+}
+.cv-preview--minimal {
+  --cv-accent: #222;
+  --cv-name-size-mult: 0.82;
+  --cv-heading-border: none;
+  --cv-heading-spacing: 0.22em;
+  --cv-header-border: none;
+  --cv-section-gap: 0.85rem;
+}
+.cv-preview--academic {
+  --cv-accent: #243b53;
+  --cv-rule: #c2cede;
+  --cv-name-size-mult: 0.95;
+  --cv-align: center;
+  --cv-heading-transform: none;
+  --cv-heading-spacing: 0;
+  --cv-header-border: 1px solid var(--cv-rule);
+  --cv-section-gap: 1.2rem;
+}
+.cv-preview--creative {
+  --cv-accent: #7c3aed;
+  --cv-rule: #d9c8f7;
+  --cv-name-size-mult: 1.3;
+  --cv-heading-border: none;
+  --cv-heading-spacing: 0.16em;
+  --cv-header-border: 4px solid var(--cv-accent);
+  --cv-section-gap: 1.35rem;
+}
+.cv-preview--creative h2 {
+  border-bottom: 2px solid var(--cv-accent);
+  border-bottom-width: 2px;
+  width: 60%;
 }
 .cv-preview p {
   margin: 0.25rem 0;

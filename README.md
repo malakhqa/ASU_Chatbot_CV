@@ -99,8 +99,10 @@ report healthy.
 2. **Fill your career profile** (`/profile`): summary, skills, experience,
    education, projects. The dashboard shows how complete it is.
 3. **Create a CV** (`/cvs/new`): **Generate from my profile** (AI drafts one) or
-   **Start blank**. Every content change is saved as a new version — nothing is
-   overwritten, and you can restore any earlier version.
+   **Start blank**. Pick one of five templates (professional / modern / minimal /
+   academic / creative) — switch any time, the preview and PDF update to match.
+   Every content change is saved as a new version — nothing is overwritten, and
+   you can restore any earlier version.
 4. **Analyse** a CV (`/cvs/:id/analyze`) for a 0–100 score with strengths,
    weaknesses, and concrete fixes.
 5. **ATS check** (`/cvs/:id/ats`) — see how cleanly an Applicant Tracking System
@@ -170,4 +172,4 @@ limited or the model is busy, the app says so and no partial data is saved.
   - [x] 25a — ATS optimization check
   - [x] 25b — Skill gap analysis
   - [x] 25c — Interview preparation
-  - [ ] 25d — Additional CV templates
+  - [x] 25d — Additional CV templates

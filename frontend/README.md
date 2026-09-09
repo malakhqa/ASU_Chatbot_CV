@@ -144,13 +144,18 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   configured", so the user can still start blank) or **Start blank**
   (`POST /api/cv`). On success it routes to `/cvs/:id`.
 - **`EditCV`** (`/cvs/:id`) is the editor: a toolbar (title, `TemplateSelector`,
-  an **Analyze** link, `CVActions`), a collapsible `VersionHistory` with restore,
-  and a two-pane `CVEditor` + live `CVPreview`. The section forms are the same
-  components as the profile editor. **Save** sends `{title, template}` in place and
-  only adds `content` to the payload when the body actually changed (so a title
-  tweak doesn't spawn a version). **Download PDF** (`GET /api/cv/:id/pdf`, blob) is
+  **Analyze** / **ATS check** / **Interview prep** / **Customize** links,
+  `CVActions`), a collapsible `VersionHistory` with restore, and a two-pane
+  `CVEditor` + live `CVPreview`. The section forms are the same components as the
+  profile editor. **Save** sends `{title, template}` in place and only adds
+  `content` to the payload when the body actually changed (so a title tweak
+  doesn't spawn a version). **Download PDF** (`GET /api/cv/:id/pdf`, blob) is
   disabled while there are unsaved edits. Loaded state lives in a single
   `draft | null` so the editor never flashes an empty frame.
+- **`CVPreview`** carries a `cv-preview--<template>` class and drives its look
+  from CSS custom properties (`--cv-accent`, header rule, heading style, spacing)
+  so the five templates — `professional`, `modern`, `minimal`, `academic`,
+  `creative` — mirror the PDF output; `academic` also leads with education.
 - **`AnalyzeCV`** (`/cvs/:id/analyze`) runs `POST /api/cv/analyze` and renders the
   result: `ScoreCard` (0–100, banded), `AnalysisResult` (strengths / weaknesses /
   missing), `Recommendations`. Past analyses (`GET /api/cv/:id/analyses`) load on

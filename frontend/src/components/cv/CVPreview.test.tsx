@@ -41,4 +41,23 @@ describe('<CVPreview />', () => {
     expect(within(exp).getByText(/2024 – Present/)).toBeInTheDocument()
     expect(within(exp).getByText('Shipped an API')).toBeInTheDocument()
   })
+
+  it('carries a template modifier class and, for academic, leads with education', () => {
+    const content: CVContent = {
+      ...emptyCVContent(),
+      personal_info: { full_name: 'A' },
+      experience: [{ title: 'Intern', company: 'Acme' }],
+      education: [{ institution: 'ASU', degree: 'BSc' }],
+    }
+
+    const { rerender } = render(<CVPreview content={content} template="professional" />)
+    expect(screen.getByLabelText('CV preview')).toHaveClass('cv-preview--professional')
+    let headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
+    expect(headings.indexOf('Experience')).toBeLessThan(headings.indexOf('Education'))
+
+    rerender(<CVPreview content={content} template="academic" />)
+    expect(screen.getByLabelText('CV preview')).toHaveClass('cv-preview--academic')
+    headings = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
+    expect(headings.indexOf('Education')).toBeLessThan(headings.indexOf('Experience'))
+  })
 })

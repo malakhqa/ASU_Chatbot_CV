@@ -240,11 +240,25 @@ tailoring target). An inline `job_description` is also persisted as a `JobDescri
 ## PDF export
 
 `GET /api/cv/{id}/pdf` renders the CV's current version via `pdf_service`
-(reportlab, pure Python — no GTK/Cairo, identical on Windows and in Docker). One
-`professional` template; unknown `template` names fall back to it. Fonts are the
-Bitstream Vera family bundled with reportlab (Latin/Latin-Extended/Greek/Cyrillic).
-Complex-script shaping (Arabic, CJK) is a known MVP limitation — no pure-Python
-engine does it well; revisit with WeasyPrint in the Docker image if needed.
+(reportlab, pure Python — no GTK/Cairo, identical on Windows and in Docker).
+
+Five templates, selected by the CV's `template` field — unknown names fall back
+to `professional`:
+
+| Template | Look |
+| -------- | ---- |
+| `professional` | Navy accent, left-aligned, thin rule under each heading, thick header rule |
+| `modern` | Teal accent, larger name, thick header bar, no heading rules, tracked headings |
+| `minimal` | Monochrome, small name, no rules at all, tight spacing |
+| `academic` | Slate accent, **centred** name & contact, Title-Case headings, **Education before Experience**, full-width rules |
+| `creative` | Violet accent, oversized name, bold header bar, short accent rules under headings |
+
+Each spec (`_TemplateSpec` in `pdf_service.py`) is a small set of knobs — accent
+colour, name size, alignment, heading case/rule, spacing, and section order.
+`available_templates()` lists them. Fonts are the Bitstream Vera family bundled
+with reportlab (Latin/Latin-Extended/Greek/Cyrillic). Complex-script shaping
+(Arabic, CJK) is a known MVP limitation — no pure-Python engine does it well;
+revisit with WeasyPrint in the Docker image if needed.
 
 ## Chatbot
 
