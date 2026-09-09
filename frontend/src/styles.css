@@ -969,3 +969,33 @@ a {
 .ats-finding__msg {
   grid-column: 3;
 }
+
+/* --- skill gap --- */
+.skill-chips {
+  list-style: none;
+  margin: 0.2rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.skill-chips li {
+  font-size: 0.8rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+}
+.skill-chips--good li {
+  border-color: #1e6b3a;
+}
+.skill-chips--warn li {
+  border-color: #b8860b;
+}
+.skill-chips--info li {
+  border-color: var(--accent);
+}
+.skill-gap__required {
+  margin-top: 0.6rem;
+  font-size: 0.85rem;
+}

@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import { Button, ErrorMessage } from '@/components/common'
-import { CustomizedCV, JobAnalysis, JobDescriptionForm } from '@/components/jobs'
+import { CustomizedCV, JobAnalysis, JobDescriptionForm, SkillGapPanel } from '@/components/jobs'
 import { saveBlob } from '@/lib/download'
 import { EMPTY_JOB_DRAFT, jobChoiceFromDraft, type JobDraft } from '@/lib/job'
 import { analysisService } from '@/services/analysisService'
 import { cvService } from '@/services/cvService'
 import { jobService } from '@/services/jobService'
-import type { AnalysisResponse, CVResponse, JobDescription } from '@/types'
+import { skillGapService } from '@/services/skillGapService'
+import type { AnalysisResponse, CVResponse, JobDescription, SkillGapResult } from '@/types'
 
 export default function CustomizeCV() {
   const { id } = useParams<{ id: string }>()
@@ -17,9 +18,11 @@ export default function CustomizeCV() {
   const [savedJobs, setSavedJobs] = useState<JobDescription[]>([])
   const [draft, setDraft] = useState<JobDraft>(EMPTY_JOB_DRAFT)
   const [match, setMatch] = useState<AnalysisResponse | null>(null)
+  const [gap, setGap] = useState<SkillGapResult | null>(null)
   const [result, setResult] = useState<CVResponse | null>(null)
 
   const [analyzing, setAnalyzing] = useState(false)
+  const [checkingGap, setCheckingGap] = useState(false)
   const [customizing, setCustomizing] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [error, setError] = useState<unknown>(null)
@@ -32,7 +35,7 @@ export default function CustomizeCV() {
   }, [])
 
   const choice = jobChoiceFromDraft(draft)
-  const busy = analyzing || customizing
+  const busy = analyzing || checkingGap || customizing
 
   const patch = (p: Partial<JobDraft>) => setDraft((d) => ({ ...d, ...p }))
 
@@ -56,6 +59,19 @@ export default function CustomizeCV() {
       setError(e)
     } finally {
       setAnalyzing(false)
+    }
+  }
+
+  const handleSkillGap = async () => {
+    setCheckingGap(true)
+    setError(null)
+    try {
+      const jobId = await ensureJobId()
+      setGap(await skillGapService.analyze({ cv_id: cvId, job_description_id: jobId }))
+    } catch (e) {
+      setError(e)
+    } finally {
+      setCheckingGap(false)
     }
   }
 
@@ -110,9 +126,19 @@ export default function CustomizeCV() {
         >
           Analyze match
         </Button>
+        <Button
+          variant="secondary"
+          onClick={handleSkillGap}
+          loading={checkingGap}
+          disabled={!choice || busy}
+        >
+          Skill gap
+        </Button>
       </div>
 
       <JobAnalysis analysis={match} />
+
+      {gap ? <SkillGapPanel result={gap} /> : null}
 
       {result ? (
         <CustomizedCV cv={result} downloading={downloading} onDownload={handleDownload} />

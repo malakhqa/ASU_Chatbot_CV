@@ -10,7 +10,8 @@ backend/
 │   ├── main.py          # app factory + entrypoint (app.main:app)
 │   ├── api/             # routers: health, auth, profile, cv, jobs, chat
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
-│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, ats, job, chatbot, pdf
+│   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, ats,
+│   │                    #   skill_gap, job, chatbot, pdf
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -191,6 +192,17 @@ the model's output — a guard against hallucinated contact details.
 `findings[]` (`{category, severity, message}` — category is one of `keywords`,
 `sections`, `formatting`, `relevance`, `content`; severity `high`/`medium`/`low`),
 `recommendations[]`. Handled by `app/services/ats_service.py`.
+
+### Skill gap analysis
+
+| Method | Path                | Body            | Notes |
+| ------ | ------------------- | --------------- | ----- |
+| POST   | `/api/cv/skill-gap` | `SkillGapRequest` (`cv_id`, `job_description_id` — **both required**) | Compares the user's skills (profile + current CV) with the job → `SkillGapResult` (200, **stateless**); 422 if no job, 404 unknown CV/job, 502/503 as above |
+
+`SkillGapResult`: `match_score` (0–100 coverage of the job's requirements),
+`required[]` (skills the job asks for), `have[]` (job-relevant skills already
+shown), `missing[]` (required but absent), `improve[]` (present but thin),
+`summary`. Handled by `app/services/skill_gap_service.py`.
 
 ## Jobs & customization
 

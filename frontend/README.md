@@ -19,7 +19,7 @@ frontend/
 │   │   ├── cv/                 # CVEditor, CVPreview, TemplateSelector, CVActions, VersionHistory
 │   │   ├── analyzer/           # ScoreCard, AnalysisResult, Recommendations, AnalysisPanel
 │   │   ├── ats/                # ATSResultPanel (ATS-readiness check)
-│   │   ├── jobs/               # JobDescriptionForm, JobAnalysis, CustomizedCV
+│   │   ├── jobs/               # JobDescriptionForm, JobAnalysis, SkillGapPanel, CustomizedCV
 │   │   ├── chatbot/            # Chatbot, ChatMessage, ChatInput, CVActionNotification
 │   │   ├── dashboard/          # ProfileStatusCard, RecentCVsCard
 │   │   └── routing/            # ProtectedRoute
@@ -49,6 +49,7 @@ frontend/
 │   │   ├── cvService.ts        # list / get / create / generate / update / versions / pdf
 │   │   ├── analysisService.ts  # analyze a CV, list past analyses
 │   │   ├── atsService.ts       # POST /api/cv/ats-check (stateless)
+│   │   ├── skillGapService.ts  # POST /api/cv/skill-gap (stateless)
 │   │   ├── jobService.ts       # jobs CRUD + POST /api/jobs/customize
 │   │   ├── chatService.ts      # send message + conversation CRUD
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
@@ -157,8 +158,10 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   relevance / content), and `Recommendations`.
 - **`CustomizeCV`** (`/cvs/:id/customize`) — pick a saved job or paste a new one
   (a new one is saved via `POST /api/jobs` before use, since analyze needs an id).
-  **Analyze match** → `POST /api/cv/analyze` with the job id → reuses the analyzer
-  panel scoped to the role. **Tailor CV for this job** → `POST /api/jobs/customize`
+  Three actions share that job: **Analyze match** → `POST /api/cv/analyze` with the
+  job id → reuses the analyzer panel scoped to the role; **Skill gap** →
+  `POST /api/cv/skill-gap` → `SkillGapPanel` (match score + have / missing /
+  worth-strengthening buckets); **Tailor CV for this job** → `POST /api/jobs/customize`
   → a new `job_customization` version; `CustomizedCV` previews it with "Open in
   editor" + "Download PDF".
 

@@ -31,6 +31,7 @@ from app.schemas.cv import (
 )
 from app.schemas.job import CustomizeRequest, JobDescriptionCreate, JobDescriptionResponse
 from app.schemas.profile import ProfileResponse, ProfileUpdate
+from app.schemas.skill_gap import SkillGapRequest, SkillGapResult
 
 __all__ = [
     "ORMModel",
@@ -64,4 +65,6 @@ __all__ = [
     "ATSCheckRequest",
     "ATSFinding",
     "ATSResult",
+    "SkillGapRequest",
+    "SkillGapResult",
 ]

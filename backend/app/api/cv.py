@@ -22,7 +22,14 @@ from app.schemas.cv import (
     CVUpdateRequest,
     CVVersionResponse,
 )
-from app.services import analysis_service, ats_service, cv_service, pdf_service
+from app.schemas.skill_gap import SkillGapRequest, SkillGapResult
+from app.services import (
+    analysis_service,
+    ats_service,
+    cv_service,
+    pdf_service,
+    skill_gap_service,
+)
 from app.services.ai_service import AIError
 from app.services.job_service import JobNotFoundError
 
@@ -88,6 +95,25 @@ def ats_check(
     """Evaluate the CV's Applicant Tracking System readiness. Stateless."""
     try:
         return ats_service.check_ats(
+            db, current_user, ai, payload.cv_id, payload.job_description_id
+        )
+    except cv_service.CVNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV not found") from None
+    except JobNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job description not found"
+        ) from None
+    except AIError as exc:
+        raise ai_http_exception(exc) from exc
+
+
+@router.post("/skill-gap", response_model=SkillGapResult)
+def skill_gap(
+    payload: SkillGapRequest, current_user: CurrentUser, db: DbSession, ai: AI
+) -> SkillGapResult:
+    """Compare the user's skills against a target job. Stateless."""
+    try:
+        return skill_gap_service.analyze_skill_gap(
             db, current_user, ai, payload.cv_id, payload.job_description_id
         )
     except cv_service.CVNotFoundError:

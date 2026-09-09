@@ -106,8 +106,9 @@ report healthy.
 5. **ATS check** (`/cvs/:id/ats`) — see how cleanly an Applicant Tracking System
    can parse the CV: section headings, keywords, formatting, and filler content.
 6. **Tailor** a CV to a job (`/cvs/:id/customize`): paste a posting, then
-   **Analyze match** or **Tailor CV for this job** (rewrites and reorders your
-   existing content — it never invents experience).
+   **Analyze match**, **Skill gap** (which of the role's skills you have, are
+   missing, or should strengthen), or **Tailor CV for this job** (rewrites and
+   reorders your existing content — it never invents experience).
 7. **Chat** (`/chat`, or the panel inside the CV editor): ask career questions,
    or say “add Docker to my skills” to apply an edit as a new version.
 8. **Download PDF** from the CV editor at any time.
@@ -164,6 +165,6 @@ limited or the model is busy, the app says so and no partial data is saved.
 - [x] Task 24 — End-to-end pass
 - Task 25 — Extended features
   - [x] 25a — ATS optimization check
-  - [ ] 25b — Skill gap analysis
+  - [x] 25b — Skill gap analysis
   - [ ] 25c — Interview preparation
   - [ ] 25d — Additional CV templates

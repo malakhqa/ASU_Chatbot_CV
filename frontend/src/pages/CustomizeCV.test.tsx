@@ -7,7 +7,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { emptyCVContent } from '@/lib/cv'
 import { analysisService } from '@/services/analysisService'
 import { jobService } from '@/services/jobService'
-import type { AnalysisResponse, CVResponse, JobDescription } from '@/types'
+import { skillGapService } from '@/services/skillGapService'
+import type { AnalysisResponse, CVResponse, JobDescription, SkillGapResult } from '@/types'
 import CustomizeCV from './CustomizeCV'
 
 vi.mock('@/services/jobService', () => ({
@@ -16,6 +17,9 @@ vi.mock('@/services/jobService', () => ({
 vi.mock('@/services/analysisService', () => ({
   analysisService: { analyze: vi.fn(), listForCv: vi.fn() },
 }))
+vi.mock('@/services/skillGapService', () => ({
+  skillGapService: { analyze: vi.fn() },
+}))
 vi.mock('@/services/cvService', () => ({ cvService: { downloadPdf: vi.fn() } }))
 vi.mock('@/lib/download', () => ({ saveBlob: vi.fn() }))
 
@@ -23,6 +27,7 @@ const list = vi.mocked(jobService.list)
 const create = vi.mocked(jobService.create)
 const customize = vi.mocked(jobService.customize)
 const analyze = vi.mocked(analysisService.analyze)
+const skillGap = vi.mocked(skillGapService.analyze)
 
 const job = (over: Partial<JobDescription> = {}): JobDescription => ({
   id: 3,
@@ -132,6 +137,32 @@ describe('<CustomizeCV />', () => {
     const panel = screen.getByRole('heading', { name: 'Match analysis' })
       .parentElement as HTMLElement
     expect(within(panel).getByText('64')).toBeInTheDocument()
+  })
+
+  it('runs a skill gap analysis for a saved job', async () => {
+    list.mockResolvedValue([job({ id: 3 })])
+    const gap: SkillGapResult = {
+      match_score: 55,
+      have: ['Python'],
+      missing: ['AWS', 'Terraform'],
+      improve: ['CI/CD'],
+      required: ['Python', 'AWS', 'Terraform'],
+      summary: 'Cloud skills are the main gap.',
+    }
+    skillGap.mockResolvedValue(gap)
+    const user = userEvent.setup()
+    setup()
+
+    await screen.findByLabelText('Job description')
+    fireEvent.change(screen.getByLabelText('Job description'), { target: { value: '3' } })
+    await user.click(screen.getByRole('button', { name: /skill gap/i }))
+
+    await waitFor(() => expect(skillGap).toHaveBeenCalledWith({ cv_id: 5, job_description_id: 3 }))
+    const panel = screen.getByRole('heading', { name: 'Skill gap' }).parentElement as HTMLElement
+    expect(within(panel).getByText('55')).toBeInTheDocument()
+    expect(within(panel).getByText('AWS')).toBeInTheDocument()
+    expect(within(panel).getByText('CI/CD')).toBeInTheDocument()
+    expect(within(panel).getByText(/cloud skills are the main gap/i)).toBeInTheDocument()
   })
 
   it('surfaces a 503', async () => {

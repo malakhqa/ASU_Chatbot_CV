@@ -23,6 +23,7 @@ export type {
 } from './cv'
 export type { AnalysisResponse, AnalysisResult, AnalyzeRequest } from './analysis'
 export type { ATSCategory, ATSCheckRequest, ATSFinding, ATSResult, ATSSeverity } from './ats'
+export type { SkillGapRequest, SkillGapResult } from './skillGap'
 export type { CustomizeRequest, JobDescription, JobDescriptionCreate } from './job'
 export type {
   ChatMessage,
