@@ -19,6 +19,7 @@ frontend/
 │   │   ├── cv/                 # CVEditor, CVPreview, TemplateSelector, CVActions, VersionHistory
 │   │   ├── analyzer/           # ScoreCard, AnalysisResult, Recommendations, AnalysisPanel
 │   │   ├── ats/                # ATSResultPanel (ATS-readiness check)
+│   │   ├── interview/          # InterviewPrepPanel (question generator)
 │   │   ├── jobs/               # JobDescriptionForm, JobAnalysis, SkillGapPanel, CustomizedCV
 │   │   ├── chatbot/            # Chatbot, ChatMessage, ChatInput, CVActionNotification
 │   │   ├── dashboard/          # ProfileStatusCard, RecentCVsCard
@@ -41,7 +42,8 @@ frontend/
 │   │   ├── format.ts           # formatDate
 │   │   └── download.ts         # saveBlob, filenameFromDisposition
 │   ├── pages/                  # Login, Register, Dashboard, Profile, MyCVs, CreateCV,
-│   │                           #   EditCV, AnalyzeCV, ATSCheck, CustomizeCV, Chat; NotFound
+│   │                           #   EditCV, AnalyzeCV, ATSCheck, InterviewPrep,
+│   │                           #   CustomizeCV, Chat; NotFound
 │   ├── services/
 │   │   ├── api.ts              # axios instance + token attach + 401→refresh→retry
 │   │   ├── authService.ts
@@ -50,6 +52,7 @@ frontend/
 │   │   ├── analysisService.ts  # analyze a CV, list past analyses
 │   │   ├── atsService.ts       # POST /api/cv/ats-check (stateless)
 │   │   ├── skillGapService.ts  # POST /api/cv/skill-gap (stateless)
+│   │   ├── interviewService.ts # POST /api/cv/interview-prep (stateless)
 │   │   ├── jobService.ts       # jobs CRUD + POST /api/jobs/customize
 │   │   ├── chatService.ts      # send message + conversation CRUD
 │   │   └── tokenStore.ts       # guarded localStorage for JWTs
@@ -156,6 +159,10 @@ doesn't 422. Repeatable sections use `RepeatableList`; `skills` /
   renders `ATSResultPanel`: `ScoreCard`, passing checks, findings sorted by
   severity (each tagged with a category — keywords / sections / formatting /
   relevance / content), and `Recommendations`.
+- **`InterviewPrep`** (`/cvs/:id/interview`) runs `POST /api/cv/interview-prep`
+  (stateless) and renders `InterviewPrepPanel`: "be ready to talk about" list,
+  questions grouped by category (behavioral / experience / technical /
+  role-specific / motivation) each with answer guidance, and a tips list.
 - **`CustomizeCV`** (`/cvs/:id/customize`) — pick a saved job or paste a new one
   (a new one is saved via `POST /api/jobs` before use, since analyze needs an id).
   Three actions share that job: **Analyze match** → `POST /api/cv/analyze` with the

@@ -22,11 +22,13 @@ from app.schemas.cv import (
     CVUpdateRequest,
     CVVersionResponse,
 )
+from app.schemas.interview import InterviewPrepRequest, InterviewPrepResult
 from app.schemas.skill_gap import SkillGapRequest, SkillGapResult
 from app.services import (
     analysis_service,
     ats_service,
     cv_service,
+    interview_service,
     pdf_service,
     skill_gap_service,
 )
@@ -114,6 +116,25 @@ def skill_gap(
     """Compare the user's skills against a target job. Stateless."""
     try:
         return skill_gap_service.analyze_skill_gap(
+            db, current_user, ai, payload.cv_id, payload.job_description_id
+        )
+    except cv_service.CVNotFoundError:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV not found") from None
+    except JobNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job description not found"
+        ) from None
+    except AIError as exc:
+        raise ai_http_exception(exc) from exc
+
+
+@router.post("/interview-prep", response_model=InterviewPrepResult)
+def interview_prep(
+    payload: InterviewPrepRequest, current_user: CurrentUser, db: DbSession, ai: AI
+) -> InterviewPrepResult:
+    """Generate likely interview questions from the CV (+ optional job). Stateless."""
+    try:
+        return interview_service.prepare_interview(
             db, current_user, ai, payload.cv_id, payload.job_description_id
         )
     except cv_service.CVNotFoundError:

@@ -11,7 +11,7 @@ backend/
 │   ├── api/             # routers: health, auth, profile, cv, jobs, chat
 │   ├── core/            # config, security (hashing + JWT), dependencies (CurrentUser, AI)
 │   ├── services/        # auth, profile, ai, prompt_builder, cv, analysis, ats,
-│   │                    #   skill_gap, job, chatbot, pdf
+│   │                    #   skill_gap, interview, job, chatbot, pdf
 │   ├── models/          # SQLAlchemy models: user, profile, cv (CV+CVVersion),
 │   │                    #   conversation (Conversation+ChatMessage), job, analysis, enums
 │   ├── schemas/         # Pydantic request/response models per area + common
@@ -203,6 +203,17 @@ the model's output — a guard against hallucinated contact details.
 `required[]` (skills the job asks for), `have[]` (job-relevant skills already
 shown), `missing[]` (required but absent), `improve[]` (present but thin),
 `summary`. Handled by `app/services/skill_gap_service.py`.
+
+### Interview preparation
+
+| Method | Path                     | Body            | Notes |
+| ------ | ------------------------ | --------------- | ----- |
+| POST   | `/api/cv/interview-prep` | `InterviewPrepRequest` (`cv_id`, optional `job_description_id`) | Generates likely interview questions from the profile + current CV → `InterviewPrepResult` (200, **stateless**); 404 unknown CV/job, 502/503 as above |
+
+`InterviewPrepResult`: `questions[]` (`{category, question, guidance}` — category
+is one of `behavioral`, `technical`, `experience`, `role_specific`, `motivation`;
+`guidance` is what a strong answer covers), `focus_areas[]` (topics to be ready
+for), `tips[]`. Handled by `app/services/interview_service.py`.
 
 ## Jobs & customization
 

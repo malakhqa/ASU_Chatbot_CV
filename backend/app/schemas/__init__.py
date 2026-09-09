@@ -29,6 +29,11 @@ from app.schemas.cv import (
     CVUpdateRequest,
     CVVersionResponse,
 )
+from app.schemas.interview import (
+    InterviewPrepRequest,
+    InterviewPrepResult,
+    InterviewQuestion,
+)
 from app.schemas.job import CustomizeRequest, JobDescriptionCreate, JobDescriptionResponse
 from app.schemas.profile import ProfileResponse, ProfileUpdate
 from app.schemas.skill_gap import SkillGapRequest, SkillGapResult
@@ -67,4 +72,7 @@ __all__ = [
     "ATSResult",
     "SkillGapRequest",
     "SkillGapResult",
+    "InterviewPrepRequest",
+    "InterviewPrepResult",
+    "InterviewQuestion",
 ]

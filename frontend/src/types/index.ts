@@ -24,6 +24,12 @@ export type {
 export type { AnalysisResponse, AnalysisResult, AnalyzeRequest } from './analysis'
 export type { ATSCategory, ATSCheckRequest, ATSFinding, ATSResult, ATSSeverity } from './ats'
 export type { SkillGapRequest, SkillGapResult } from './skillGap'
+export type {
+  InterviewPrepRequest,
+  InterviewPrepResult,
+  InterviewQuestion,
+  QuestionCategory,
+} from './interview'
 export type { CustomizeRequest, JobDescription, JobDescriptionCreate } from './job'
 export type {
   ChatMessage,

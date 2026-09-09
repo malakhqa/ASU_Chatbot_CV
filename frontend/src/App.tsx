@@ -10,6 +10,7 @@ import CreateCV from '@/pages/CreateCV'
 import CustomizeCV from '@/pages/CustomizeCV'
 import Dashboard from '@/pages/Dashboard'
 import EditCV from '@/pages/EditCV'
+import InterviewPrep from '@/pages/InterviewPrep'
 import Login from '@/pages/Login'
 import MyCVs from '@/pages/MyCVs'
 import NotFound from '@/pages/NotFound'
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="cvs/:id" element={<EditCV />} />
               <Route path="cvs/:id/analyze" element={<AnalyzeCV />} />
               <Route path="cvs/:id/ats" element={<ATSCheck />} />
+              <Route path="cvs/:id/interview" element={<InterviewPrep />} />
               <Route path="cvs/:id/customize" element={<CustomizeCV />} />
               <Route path="chat" element={<Chat />} />
             </Route>
